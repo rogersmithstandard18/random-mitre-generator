@@ -1,48 +1,68 @@
-
-import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { useTopicStore } from '@/store/topicStore';
 import Button from '@/components/Button';
+import FilterBar from '@/components/FilterBar';
 import colors from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 
 export default function HomeScreen() {
-  const generateRandomTopic = useTopicStore(state => state.generateRandomTopic);
+  const { generateRandomCard, generateRandomTopic } = useTopicStore();
+  const [showFilters, setShowFilters] = useState(false);
 
-  const handleGeneratePress = () => {
-    // Provide haptic feedback on press
+  const handleGenerateCard = () => {
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
-    // Generate a new random topic
+    generateRandomCard();
+    router.push('/tabs/topic');
+  };
+
+  const handleGenerateTactic = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     generateRandomTopic();
-    
-    // Navigate to the topic screen
-    router.push('/topic');
+    router.push('/tabs/topic');
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Random</Text>
+        <Text style={styles.title}>MITRE ATT&CK</Text>
+        <Text style={styles.subtitle}>Push-Button Learning</Text>
       </View>
-      
+
       <View style={styles.buttonContainer}>
-        <Button 
-          isCircle 
-          onPress={handleGeneratePress} 
+        <Button
+          isCircle
+          onPress={handleGenerateCard}
           style={styles.circleButton}
         />
         <View style={styles.buttonHighlight} />
       </View>
-      
-      <Text style={styles.generatorText}>Generator</Text>
-      
+
+      <Text style={styles.generatorText}>Learn One Concept</Text>
+      <Text style={styles.hint}>Tap the button to get a Translation Card</Text>
+
+      {/* Filter toggle */}
+      <TouchableOpacity onPress={() => setShowFilters(!showFilters)} style={styles.filterToggle}>
+        <Text style={styles.filterToggleText}>
+          {showFilters ? 'Hide Filters' : 'Filter by Path / Difficulty / Tactic'}
+        </Text>
+      </TouchableOpacity>
+
+      {showFilters && <FilterBar />}
+
+      {/* Legacy tactic mode */}
+      <TouchableOpacity onPress={handleGenerateTactic} style={styles.tacticLink}>
+        <Text style={styles.tacticLinkText}>or generate a random tactic overview</Text>
+      </TouchableOpacity>
+
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Random MITRE ATT&CK Generator</Text>
+        <Text style={styles.footerText}>MITRE ATT&CK Cybersecurity Learning</Text>
       </View>
     </View>
   );
@@ -55,16 +75,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    marginTop: 40,
+    marginTop: 30,
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: 'bold',
     color: colors.text,
   },
+  subtitle: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
   buttonContainer: {
-    marginTop: 60,
+    marginTop: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -85,10 +110,35 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   generatorText: {
-    marginTop: 60,
-    fontSize: 32,
+    marginTop: 30,
+    fontSize: 24,
     fontWeight: 'bold',
     color: colors.text,
+  },
+  hint: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  filterToggle: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginBottom: 4,
+  },
+  filterToggleText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  tacticLink: {
+    marginTop: 12,
+    paddingVertical: 8,
+  },
+  tacticLinkText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
   footer: {
     position: 'absolute',

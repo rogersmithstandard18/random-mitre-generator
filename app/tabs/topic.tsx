@@ -1,61 +1,61 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { router } from 'expo-router';
 import { useTopicStore } from '@/store/topicStore';
 import Button from '@/components/Button';
 import TopicCard from '@/components/TopicCard';
+import TranslationCardView from '@/components/TranslationCardView';
 import colors from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 import { Platform } from 'react-native';
 
 export default function TopicScreen() {
-  const { currentTopic, generateRandomTopic } = useTopicStore();
+  const { currentTopic, currentCard, generateRandomCard, generateRandomTopic } = useTopicStore();
 
   useEffect(() => {
-    // If there's no current topic, generate one or go back to home
-    if (!currentTopic) {
-      generateRandomTopic();
+    if (!currentCard && !currentTopic) {
+      generateRandomCard();
     }
-  }, [currentTopic, generateRandomTopic]);
+  }, []);
 
   const handleGenerateNew = () => {
-    // Provide haptic feedback on press
     if (Platform.OS !== 'web') {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
-    
-    // Generate a new random topic
-    generateRandomTopic();
+    generateRandomCard();
   };
 
-  if (!currentTopic) {
+  if (!currentCard && !currentTopic) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading topic...</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <TopicCard topic={currentTopic} />
-        
+        {currentCard ? (
+          <TranslationCardView card={currentCard} />
+        ) : currentTopic ? (
+          <TopicCard topic={currentTopic} />
+        ) : null}
+
         <View style={styles.buttonContainer}>
           <Button
-            title="GENERATE NEW"
+            title="NEXT CONCEPT"
             onPress={handleGenerateNew}
             style={styles.generateButton}
           />
         </View>
       </ScrollView>
-      
+
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Random MITRE ATT&CK Generator</Text>
+        <Text style={styles.footerText}>MITRE ATT&CK Cybersecurity Learning</Text>
       </View>
     </View>
   );

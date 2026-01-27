@@ -1,0 +1,679 @@
+import { TranslationCard } from '@/types/TranslationCard';
+
+const techniques: TranslationCard[] = [
+  // --- Initial Access ---
+  {
+    techniqueId: 'T1566',
+    techniqueName: 'Phishing',
+    tactic: 'Initial Access',
+    tacticId: 'TA0001',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers send deceptive emails or messages to trick users into clicking malicious links, opening weaponized attachments, or revealing credentials.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'A single successful phishing email can grant an attacker a foothold inside the corporate network, leading to data theft, ransomware deployment, or wire-fraud losses.',
+    boardroomPitch:
+      'Phishing is the number-one way attackers get inside organizations. One click by one employee can expose customer data, trigger regulatory fines, and halt operations.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Business email compromise leading to fraudulent wire transfers and account takeover.' },
+      { industry: 'Healthcare', description: 'Credential harvesting that exposes electronic health records and triggers HIPAA breach notifications.' },
+      { industry: 'Retail', description: 'Point-of-sale credential theft resulting in payment card data exposure.' },
+    ],
+    detectionHints: ['Email gateway filtering for suspicious attachments', 'URL sandboxing and click-time protection', 'User-reported phishing workflows'],
+    mitigations: ['Security awareness training', 'Multi-factor authentication', 'DMARC / DKIM / SPF email authentication'],
+    reflectionQuestion: 'Why is phishing still the most common initial access vector despite decades of awareness training?',
+    spotTheRisk: 'A finance team member receives an email from the CEO asking for an urgent wire transfer. The email address is one letter off from the real domain.',
+  },
+  {
+    techniqueId: 'T1190',
+    techniqueName: 'Exploit Public-Facing Application',
+    tactic: 'Initial Access',
+    tacticId: 'TA0001',
+    difficulty: 'Intermediate',
+    learningPaths: ['Red Team', 'Blue Team'],
+    plainExplanation:
+      'Attackers exploit vulnerabilities in internet-facing applications such as web servers, VPNs, or email gateways to gain unauthorized access.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'An unpatched public application can be weaponized to breach the perimeter, potentially taking down customer-facing services and exposing backend databases.',
+    boardroomPitch:
+      'When our web applications or VPN gateways have known vulnerabilities, attackers can walk right in. Timely patching is a direct investment in business continuity.',
+    industryImpacts: [
+      { industry: 'Technology', description: 'SaaS platform compromise affecting thousands of downstream customers.' },
+      { industry: 'Government', description: 'Exploitation of citizen-facing portals leading to mass PII exposure.' },
+    ],
+    detectionHints: ['Web application firewall (WAF) alerts', 'Anomalous POST requests or error spikes', 'Vulnerability scan correlation'],
+    mitigations: ['Timely patch management', 'Web application firewalls', 'Network segmentation behind DMZ'],
+    reflectionQuestion: 'What factors make patching public-facing applications difficult for large organizations?',
+    spotTheRisk: 'A vulnerability scan shows a critical CVE on the company VPN appliance. The patch has been available for 60 days but has not been applied.',
+  },
+  {
+    techniqueId: 'T1195',
+    techniqueName: 'Supply Chain Compromise',
+    tactic: 'Initial Access',
+    tacticId: 'TA0001',
+    difficulty: 'Advanced',
+    learningPaths: ['Purple Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers compromise a trusted third-party vendor or software update mechanism to distribute malicious code to the vendor\'s customers.',
+    riskCategory: 'Legal Liability',
+    riskDescription:
+      'A compromised vendor update can silently install backdoors across thousands of organizations, creating massive legal exposure and trust erosion.',
+    boardroomPitch:
+      'When a trusted software vendor is compromised, their update becomes our vulnerability. Third-party risk management is essential to protect the entire supply chain.',
+    industryImpacts: [
+      { industry: 'Government', description: 'Nation-state actors targeting government IT management software to access classified networks.' },
+      { industry: 'Technology', description: 'Compromised developer tools or libraries affecting thousands of downstream applications.' },
+    ],
+    detectionHints: ['Software bill of materials (SBOM) monitoring', 'Behavioral analysis of software updates', 'Network traffic anomaly detection post-update'],
+    mitigations: ['Vendor security assessments', 'Software composition analysis', 'Zero-trust architecture for vendor connections'],
+    reflectionQuestion: 'How does the SolarWinds incident illustrate the cascading risk of supply chain compromise?',
+    spotTheRisk: 'A critical business application receives an automatic update from the vendor. The update was signed with a valid certificate but contains an unexpected outbound connection.',
+  },
+
+  // --- Execution ---
+  {
+    techniqueId: 'T1059',
+    techniqueName: 'Command and Scripting Interpreter',
+    tactic: 'Execution',
+    tacticId: 'TA0002',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'Red Team'],
+    plainExplanation:
+      'Attackers use built-in command-line tools like PowerShell, Bash, or Python to execute malicious commands on a compromised system.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'Abuse of legitimate scripting tools makes malicious activity hard to distinguish from normal administration, enabling attackers to operate undetected.',
+    boardroomPitch:
+      'Attackers use the same tools our IT team uses every day. Without proper logging and monitoring of scripts, malicious activity blends into normal operations.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'PowerShell-based attacks automating credential theft across trading systems.' },
+      { industry: 'Manufacturing', description: 'Scripts disabling safety systems on operational technology networks.' },
+    ],
+    detectionHints: ['PowerShell script block logging', 'Command-line argument monitoring', 'Behavioral analytics for unusual script execution'],
+    mitigations: ['Application allowlisting', 'Constrained language mode for PowerShell', 'Script signing enforcement'],
+    reflectionQuestion: 'Why is it challenging to block scripting interpreters when they are essential for system administration?',
+    spotTheRisk: 'A help desk workstation begins executing encoded PowerShell commands at 2 AM. The commands are downloading files from an external IP address.',
+  },
+  {
+    techniqueId: 'T1204',
+    techniqueName: 'User Execution',
+    tactic: 'Execution',
+    tacticId: 'TA0002',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers rely on a user to run a malicious file, click a link, or enable macros — the human becomes the execution mechanism.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'Social engineering tricks users into executing malware, bypassing technical controls and making the human element the weakest link in the security chain.',
+    boardroomPitch:
+      'No firewall can stop an employee from double-clicking a file they believe is legitimate. Investing in user education directly reduces our exposure to ransomware and data theft.',
+    industryImpacts: [
+      { industry: 'Healthcare', description: 'Staff opening malicious attachments disguised as patient records, deploying ransomware across hospital systems.' },
+      { industry: 'Retail', description: 'Employees running fake invoice documents that install keyloggers capturing payment data.' },
+    ],
+    detectionHints: ['Endpoint detection for newly dropped executables', 'Macro execution monitoring in Office applications', 'Sandbox detonation of email attachments'],
+    mitigations: ['Disable Office macros by default', 'Application allowlisting', 'Security awareness training'],
+    reflectionQuestion: 'How can organizations reduce reliance on user judgment without restricting legitimate business workflows?',
+    spotTheRisk: 'An HR employee receives a "resume" attachment in .docm format. When opened, it asks to "Enable Content" to view the document.',
+  },
+
+  // --- Persistence ---
+  {
+    techniqueId: 'T1547',
+    techniqueName: 'Boot or Logon Autostart Execution',
+    tactic: 'Persistence',
+    tacticId: 'TA0003',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Red Team'],
+    plainExplanation:
+      'Attackers configure malware to run automatically when the system boots or a user logs in, ensuring they maintain access even after a reboot.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'Persistent malware survives reboots and reimaging attempts, extending dwell time and increasing the cost and complexity of incident response.',
+    boardroomPitch:
+      'Once an attacker sets up persistence, simply restarting a computer does not remove them. Detection and remediation become significantly more expensive the longer they remain.',
+    industryImpacts: [
+      { industry: 'Government', description: 'Persistent backdoors in government workstations enabling long-term intelligence collection.' },
+      { industry: 'Financial Services', description: 'Malware surviving endpoint rebuilds and re-establishing access to trading platforms.' },
+    ],
+    detectionHints: ['Registry run key monitoring', 'Startup folder change alerts', 'Scheduled task auditing'],
+    mitigations: ['Endpoint detection and response (EDR)', 'Application allowlisting', 'Regular baseline comparison of autostart locations'],
+    reflectionQuestion: 'Why is persistence one of the first objectives for an attacker after gaining initial access?',
+    spotTheRisk: 'After a security incident, the IT team reimages an affected laptop. Within hours, the same C2 beacon reappears — the attacker placed a registry run key that was included in the system backup image.',
+  },
+  {
+    techniqueId: 'T1136',
+    techniqueName: 'Create Account',
+    tactic: 'Persistence',
+    tacticId: 'TA0003',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers create new user accounts on compromised systems or in cloud environments to maintain access that looks like a legitimate user.',
+    riskCategory: 'Audit Failure',
+    riskDescription:
+      'Unauthorized accounts that bypass normal provisioning workflows create gaps in identity governance and can go undetected during audits.',
+    boardroomPitch:
+      'If attackers can create their own accounts in our environment, they look like employees. This undermines our identity controls and can cause audit findings.',
+    industryImpacts: [
+      { industry: 'Healthcare', description: 'Rogue accounts accessing electronic health records outside of approved clinical workflows.' },
+      { industry: 'Technology', description: 'Unauthorized cloud IAM accounts provisioned with admin privileges across production environments.' },
+    ],
+    detectionHints: ['Alerts on account creation outside of HR provisioning workflows', 'Cloud IAM change monitoring', 'Privileged account anomaly detection'],
+    mitigations: ['Identity governance and access reviews', 'Just-in-time account provisioning', 'Cloud security posture management'],
+    reflectionQuestion: 'How can organizations detect the difference between a legitimately provisioned account and one created by an attacker?',
+    spotTheRisk: 'A new admin account appears in Active Directory at 11 PM on a Saturday. It was not created through the standard HR onboarding process.',
+  },
+
+  // --- Privilege Escalation ---
+  {
+    techniqueId: 'T1068',
+    techniqueName: 'Exploitation for Privilege Escalation',
+    tactic: 'Privilege Escalation',
+    tacticId: 'TA0004',
+    difficulty: 'Advanced',
+    learningPaths: ['Red Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers exploit software vulnerabilities in the operating system or applications to gain higher privileges, such as moving from a standard user to administrator.',
+    riskCategory: 'Regulatory Action',
+    riskDescription:
+      'Privilege escalation allows attackers to access regulated data and critical systems, potentially triggering compliance violations and mandatory breach disclosures.',
+    boardroomPitch:
+      'When an attacker elevates from a regular user to an admin, they gain access to everything — customer data, financial systems, and intellectual property. Hardening systems against this is a compliance imperative.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Escalation to domain admin enabling access to core banking systems and transaction databases.' },
+      { industry: 'Government', description: 'Privilege escalation on classified networks enabling unauthorized access to sensitive information.' },
+    ],
+    detectionHints: ['Endpoint exploit detection signatures', 'Unexpected privilege changes in SIEM', 'Kernel-level integrity monitoring'],
+    mitigations: ['Timely OS and application patching', 'Least privilege enforcement', 'Exploit guard / attack surface reduction rules'],
+    reflectionQuestion: 'Why is the principle of least privilege the most effective defense against privilege escalation?',
+    spotTheRisk: 'A standard user account suddenly appears in the Domain Admins group. No change request or approval exists in the ticketing system.',
+  },
+  {
+    techniqueId: 'T1548',
+    techniqueName: 'Abuse Elevation Control Mechanism',
+    tactic: 'Privilege Escalation',
+    tacticId: 'TA0004',
+    difficulty: 'Intermediate',
+    learningPaths: ['Red Team', 'Blue Team'],
+    plainExplanation:
+      'Attackers bypass built-in access controls like UAC (Windows) or sudo (Linux) to execute code with elevated privileges without proper authorization.',
+    riskCategory: 'Audit Failure',
+    riskDescription:
+      'Circumventing elevation controls undermines the integrity of access management frameworks and creates findings during security audits.',
+    boardroomPitch:
+      'Our operating systems have built-in guardrails to prevent unauthorized elevation. When attackers bypass these, the entire access control model is compromised.',
+    industryImpacts: [
+      { industry: 'Manufacturing', description: 'UAC bypass on engineering workstations enabling unauthorized changes to industrial control configurations.' },
+      { industry: 'Technology', description: 'Sudo bypass on Linux servers granting root access to production infrastructure.' },
+    ],
+    detectionHints: ['UAC bypass technique signatures', 'Unexpected sudo usage patterns', 'Process creation with unusual parent-child relationships'],
+    mitigations: ['Enforce UAC at highest level', 'Restrict sudo access tightly', 'Privileged access management (PAM) solutions'],
+    reflectionQuestion: 'What is the difference between UAC bypass and a legitimate admin elevation?',
+    spotTheRisk: 'An endpoint alerts on a process spawning with SYSTEM privileges from a user-level application without any UAC prompt being displayed.',
+  },
+
+  // --- Defense Evasion ---
+  {
+    techniqueId: 'T1070',
+    techniqueName: 'Indicator Removal',
+    tactic: 'Defense Evasion',
+    tacticId: 'TA0005',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers delete or modify logs, files, and other artifacts to remove evidence of their presence and make forensic investigation more difficult.',
+    riskCategory: 'Audit Failure',
+    riskDescription:
+      'Destroyed evidence impairs incident response, undermines forensic integrity, and can lead to regulatory penalties for inadequate log retention.',
+    boardroomPitch:
+      'When attackers erase their tracks, we lose visibility into what happened and what data was compromised. Centralized, tamper-proof logging is essential for both security and compliance.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Cleared transaction logs making it impossible to reconstruct the scope of financial fraud.' },
+      { industry: 'Healthcare', description: 'Deleted access logs preventing determination of which patient records were viewed or exfiltrated.' },
+    ],
+    detectionHints: ['Log gap detection in SIEM', 'File integrity monitoring on log directories', 'Event log clearing event (Event ID 1102)'],
+    mitigations: ['Centralized log forwarding (SIEM)', 'Immutable log storage', 'Endpoint detection monitoring for log tampering'],
+    reflectionQuestion: 'Why should logs be forwarded to a separate system in real time rather than stored only on the source machine?',
+    spotTheRisk: 'The Windows Security event log on a domain controller was cleared at 3 AM. The only remaining event is Event ID 1102 showing the log was cleared by an admin account.',
+  },
+  {
+    techniqueId: 'T1027',
+    techniqueName: 'Obfuscated Files or Information',
+    tactic: 'Defense Evasion',
+    tacticId: 'TA0005',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Red Team'],
+    plainExplanation:
+      'Attackers encode, encrypt, or otherwise obscure malicious code and data to evade signature-based detection tools like antivirus.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'Obfuscated malware can bypass security tools, extending attacker dwell time and increasing the blast radius of an incident before detection occurs.',
+    boardroomPitch:
+      'Modern attackers disguise their tools to slip past antivirus and email filters. This is why behavior-based detection and defense-in-depth are critical investments.',
+    industryImpacts: [
+      { industry: 'Technology', description: 'Obfuscated scripts in CI/CD pipelines deploying hidden backdoors into production builds.' },
+      { industry: 'Government', description: 'Encrypted payloads evading classified network monitoring tools.' },
+    ],
+    detectionHints: ['Entropy analysis on suspicious files', 'Behavioral detection of decoded payloads at runtime', 'AMSI (Antimalware Scan Interface) integration'],
+    mitigations: ['Behavior-based endpoint protection', 'Sandboxing for file detonation', 'Script block logging and AMSI enforcement'],
+    reflectionQuestion: 'Why are signature-based defenses insufficient against obfuscated malware?',
+    spotTheRisk: 'An email attachment passes antivirus scanning, but when executed, it decodes a Base64-encoded payload and establishes an outbound connection.',
+  },
+
+  // --- Credential Access ---
+  {
+    techniqueId: 'T1003',
+    techniqueName: 'OS Credential Dumping',
+    tactic: 'Credential Access',
+    tacticId: 'TA0006',
+    difficulty: 'Intermediate',
+    learningPaths: ['Red Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers extract stored credentials (password hashes, tokens, tickets) from operating system memory or files to authenticate as legitimate users.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'Dumped credentials give attackers the keys to move laterally, access sensitive data, and impersonate privileged users — dramatically increasing breach costs.',
+    boardroomPitch:
+      'When attackers steal credentials from memory, they can log in as our admins. This is why privileged access management and credential hygiene are critical investments.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Dumped domain admin credentials used to access core banking and wire transfer systems.' },
+      { industry: 'Government', description: 'Credential extraction from classified workstations enabling lateral movement to high-value intelligence systems.' },
+    ],
+    detectionHints: ['LSASS memory access alerts', 'Credential Guard status monitoring', 'Honeypot credential detection'],
+    mitigations: ['Windows Credential Guard', 'Privileged access workstations (PAWs)', 'Restrict debug privileges'],
+    reflectionQuestion: 'Why do attackers target LSASS memory specifically, and how does Credential Guard mitigate this?',
+    spotTheRisk: 'An EDR alert shows a process (not an admin tool) attempting to read the memory of lsass.exe on a domain controller.',
+  },
+  {
+    techniqueId: 'T1110',
+    techniqueName: 'Brute Force',
+    tactic: 'Credential Access',
+    tacticId: 'TA0006',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers systematically try many passwords or credential combinations to guess the correct one and gain access to accounts.',
+    riskCategory: 'Regulatory Action',
+    riskDescription:
+      'Successful brute force attacks often indicate weak password policies, which regulators view as a fundamental control failure.',
+    boardroomPitch:
+      'If our accounts can be guessed through repeated login attempts, we have a password policy problem. Account lockout and MFA are the minimum standard regulators expect.',
+    industryImpacts: [
+      { industry: 'Healthcare', description: 'Brute-forced clinician accounts providing access to patient records and prescription systems.' },
+      { industry: 'Retail', description: 'Credential stuffing attacks on customer loyalty accounts leading to points theft and data exposure.' },
+    ],
+    detectionHints: ['Failed login threshold alerts', 'Password spray detection across multiple accounts', 'Geo-impossible travel alerts'],
+    mitigations: ['Multi-factor authentication', 'Account lockout policies', 'Password complexity requirements and breach-password screening'],
+    reflectionQuestion: 'What is the difference between brute force, password spraying, and credential stuffing?',
+    spotTheRisk: 'The SIEM shows 500 failed login attempts against the VPN portal in 10 minutes, each using a different username but the same password.',
+  },
+
+  // --- Discovery ---
+  {
+    techniqueId: 'T1087',
+    techniqueName: 'Account Discovery',
+    tactic: 'Discovery',
+    tacticId: 'TA0007',
+    difficulty: 'Beginner',
+    learningPaths: ['Red Team', 'Blue Team'],
+    plainExplanation:
+      'Attackers enumerate user accounts on local systems, domains, or cloud environments to identify high-value targets for further exploitation.',
+    riskCategory: 'Loss of Confidence',
+    riskDescription:
+      'Account enumeration reveals the organizational structure and identifies privileged accounts, providing attackers a roadmap for escalation.',
+    boardroomPitch:
+      'Attackers map out our user accounts to find admin and executive targets. Monitoring for unusual account queries helps us catch intruders during the reconnaissance phase.',
+    industryImpacts: [
+      { industry: 'Technology', description: 'Enumeration of cloud IAM roles identifying service accounts with overprivileged access.' },
+      { industry: 'Financial Services', description: 'Discovery of privileged trading system accounts for targeted credential attacks.' },
+    ],
+    detectionHints: ['Unusual LDAP queries from non-admin workstations', 'Cloud API calls listing IAM users', 'Net user / net group command monitoring'],
+    mitigations: ['Restrict LDAP query access', 'Monitor cloud IAM API usage', 'Limit account visibility through tiered administration'],
+    reflectionQuestion: 'Why is account discovery a critical step for attackers before lateral movement?',
+    spotTheRisk: 'A workstation in the marketing department is running "net group Domain Admins /domain" commands during business hours.',
+  },
+  {
+    techniqueId: 'T1046',
+    techniqueName: 'Network Service Scanning',
+    tactic: 'Discovery',
+    tacticId: 'TA0007',
+    difficulty: 'Beginner',
+    learningPaths: ['Red Team', 'Blue Team'],
+    plainExplanation:
+      'Attackers scan the internal network to discover available services, open ports, and potential targets for lateral movement.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'Internal scanning provides attackers a map of the network, revealing vulnerable services and pathways to critical systems.',
+    boardroomPitch:
+      'Once inside our network, attackers scan for open doors — unpatched services, exposed databases, management interfaces. Network segmentation limits what they can find.',
+    industryImpacts: [
+      { industry: 'Manufacturing', description: 'Scanning revealing exposed SCADA and ICS systems on flat network segments.' },
+      { industry: 'Healthcare', description: 'Discovery of unsegmented medical devices with known vulnerabilities.' },
+    ],
+    detectionHints: ['Internal network scan detection (port sweep alerts)', 'Anomalous connection volume from single host', 'IDS/IPS signature for scanning tools'],
+    mitigations: ['Network segmentation and microsegmentation', 'Host-based firewalls', 'Intrusion detection systems on internal segments'],
+    reflectionQuestion: 'How does network segmentation reduce the value of internal network scanning for an attacker?',
+    spotTheRisk: 'Network monitoring shows a single workstation attempting connections to port 445 on every IP address in the 10.0.0.0/16 subnet within 5 minutes.',
+  },
+
+  // --- Lateral Movement ---
+  {
+    techniqueId: 'T1021',
+    techniqueName: 'Remote Services',
+    tactic: 'Lateral Movement',
+    tacticId: 'TA0008',
+    difficulty: 'Intermediate',
+    learningPaths: ['Red Team', 'Blue Team'],
+    plainExplanation:
+      'Attackers use legitimate remote access services like RDP, SSH, or SMB to move between systems using stolen credentials.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'Lateral movement through remote services allows attackers to reach high-value targets like financial systems, databases, and domain controllers.',
+    boardroomPitch:
+      'Attackers use the same remote access tools our IT staff relies on. Without proper segmentation and monitoring, they can reach any system in the network.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'RDP lateral movement from a compromised workstation to payment processing servers.' },
+      { industry: 'Government', description: 'SSH pivoting across segmented networks to reach classified information systems.' },
+    ],
+    detectionHints: ['Unusual RDP/SSH sessions from non-admin endpoints', 'Lateral movement analytics in EDR', 'Authentication anomaly detection'],
+    mitigations: ['Network segmentation', 'Restrict remote service access to jump servers', 'Privileged access management'],
+    reflectionQuestion: 'Why should organizations use jump servers instead of allowing direct RDP/SSH between all systems?',
+    spotTheRisk: 'A workstation in accounting establishes an RDP session to a database server at 11 PM. The account used has never accessed that server before.',
+  },
+  {
+    techniqueId: 'T1550',
+    techniqueName: 'Use Alternate Authentication Material',
+    tactic: 'Lateral Movement',
+    tacticId: 'TA0008',
+    difficulty: 'Advanced',
+    learningPaths: ['Red Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers use stolen password hashes, Kerberos tickets, or tokens instead of plaintext passwords to authenticate and move laterally.',
+    riskCategory: 'Loss of Confidence',
+    riskDescription:
+      'Pass-the-hash and pass-the-ticket attacks bypass traditional authentication logging, making attacker movement invisible to standard monitoring.',
+    boardroomPitch:
+      'Attackers do not need to know passwords — stolen authentication tokens let them impersonate any user. This makes strong credential isolation and monitoring essential.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Golden ticket attacks granting persistent, undetectable access to the entire Active Directory domain.' },
+      { industry: 'Technology', description: 'Stolen OAuth tokens providing access to cloud services and SaaS applications without triggering MFA.' },
+    ],
+    detectionHints: ['Kerberos anomaly detection (overpass-the-hash)', 'Token replay detection', 'Impossible travel for authentication events'],
+    mitigations: ['Credential Guard', 'Regular KRBTGT password rotation', 'Tiered administration model'],
+    reflectionQuestion: 'What is the difference between pass-the-hash, pass-the-ticket, and golden ticket attacks?',
+    spotTheRisk: 'A Kerberos ticket for a domain admin account has a 10-year expiration. Normal tickets in this environment expire after 10 hours.',
+  },
+
+  // --- Collection ---
+  {
+    techniqueId: 'T1114',
+    techniqueName: 'Email Collection',
+    tactic: 'Collection',
+    tacticId: 'TA0009',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers access email accounts or servers to collect sensitive communications, contacts, attachments, and organizational intelligence.',
+    riskCategory: 'Legal Liability',
+    riskDescription:
+      'Email collections can expose attorney-client privilege, trade secrets, M&A plans, and regulated personal data — creating significant legal and regulatory exposure.',
+    boardroomPitch:
+      'Our email contains our most sensitive communications — legal strategy, financial plans, customer data. When attackers access mailboxes, the exposure is both legal and reputational.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Access to executive mailboxes revealing upcoming M&A activity, enabling insider trading.' },
+      { industry: 'Government', description: 'Collection of diplomatic communications for intelligence purposes.' },
+    ],
+    detectionHints: ['Unusual mailbox access patterns (volume, time, location)', 'Email forwarding rule creation alerts', 'eDiscovery / compliance search monitoring'],
+    mitigations: ['Mailbox access auditing', 'Conditional access policies', 'Data loss prevention for email'],
+    reflectionQuestion: 'Why is email one of the highest-value targets for both espionage and financial crime?',
+    spotTheRisk: 'A new inbox rule is created on the CFO\'s mailbox forwarding all emails containing "merger," "acquisition," or "confidential" to an external Gmail address.',
+  },
+  {
+    techniqueId: 'T1113',
+    techniqueName: 'Screen Capture',
+    tactic: 'Collection',
+    tacticId: 'TA0009',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'Red Team'],
+    plainExplanation:
+      'Attackers take screenshots of the victim\'s desktop to capture displayed information such as documents, credentials, or sensitive applications.',
+    riskCategory: 'Loss of Confidence',
+    riskDescription:
+      'Screen captures can expose any information visible on screen, including data not stored in files — such as dashboards, messages, and live transactions.',
+    boardroomPitch:
+      'Attackers can silently photograph everything on an employee\'s screen. This captures data that never gets saved to a file — trading screens, chat messages, client information.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Screenshots of trading terminals capturing position data and order flow.' },
+      { industry: 'Healthcare', description: 'Screen captures of patient charts during clinical review.' },
+    ],
+    detectionHints: ['API calls to screen capture functions', 'Unusual image files in temp directories', 'EDR behavior analytics for screenshot tools'],
+    mitigations: ['Endpoint detection for screen capture APIs', 'Desktop watermarking', 'Application-level screen capture prevention'],
+    reflectionQuestion: 'Why is screen capture particularly dangerous for organizations that handle sensitive visual data?',
+    spotTheRisk: 'An EDR alert shows a process repeatedly calling the Windows GDI screen capture API every 30 seconds and saving JPG files to a hidden temp folder.',
+  },
+
+  // --- Exfiltration ---
+  {
+    techniqueId: 'T1041',
+    techniqueName: 'Exfiltration Over C2 Channel',
+    tactic: 'Exfiltration',
+    tacticId: 'TA0010',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers steal data by sending it out through the same command-and-control connection they use to control the compromised system.',
+    riskCategory: 'Regulatory Action',
+    riskDescription:
+      'Data exfiltration over existing C2 channels is harder to detect because it blends with the attacker\'s normal communication, delaying breach discovery and notification.',
+    boardroomPitch:
+      'Attackers can steal our data through the same hidden channel they use to control compromised machines. Without network monitoring for unusual outbound traffic, we may never know data left.',
+    industryImpacts: [
+      { industry: 'Healthcare', description: 'Patient records exfiltrated over encrypted C2 channel, delaying HIPAA breach notification timeline.' },
+      { industry: 'Retail', description: 'Payment card data exfiltrated in small batches to avoid detection thresholds.' },
+    ],
+    detectionHints: ['Unusual outbound data volume per endpoint', 'Beaconing detection (periodic outbound connections)', 'DNS tunneling detection'],
+    mitigations: ['Network DLP', 'Egress filtering', 'TLS inspection for outbound traffic'],
+    reflectionQuestion: 'Why does combining C2 and exfiltration into one channel make detection more difficult?',
+    spotTheRisk: 'Network monitoring shows a workstation sending 2 GB of data to a cloud service IP over HTTPS at 2 AM on a weekend. Normal daily upload volume for this host is under 50 MB.',
+  },
+  {
+    techniqueId: 'T1567',
+    techniqueName: 'Exfiltration Over Web Service',
+    tactic: 'Exfiltration',
+    tacticId: 'TA0010',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers upload stolen data to legitimate cloud services like Google Drive, Dropbox, or Pastebin to blend exfiltration with normal business traffic.',
+    riskCategory: 'Regulatory Action',
+    riskDescription:
+      'Using legitimate cloud services for exfiltration makes stolen data nearly invisible in network logs, delaying detection and breach response.',
+    boardroomPitch:
+      'Attackers upload our data to the same cloud services we use every day — Google Drive, OneDrive, Dropbox. Without cloud access controls, data walks out the front door.',
+    industryImpacts: [
+      { industry: 'Technology', description: 'Source code uploaded to personal cloud storage accounts by compromised developer workstations.' },
+      { industry: 'Financial Services', description: 'Customer account data exfiltrated to file-sharing services, triggering PCI DSS and privacy violations.' },
+    ],
+    detectionHints: ['Cloud access security broker (CASB) monitoring', 'Unusual upload volume to cloud storage', 'DLP policy triggers on sensitive file patterns'],
+    mitigations: ['CASB deployment', 'Restrict personal cloud storage access', 'Endpoint DLP'],
+    reflectionQuestion: 'How does the use of legitimate cloud services for exfiltration challenge traditional network security controls?',
+    spotTheRisk: 'A finance department laptop uploads 500 MB to a personal Dropbox account. The organization uses OneDrive as its approved cloud storage.',
+  },
+
+  // --- Command and Control ---
+  {
+    techniqueId: 'T1071',
+    techniqueName: 'Application Layer Protocol',
+    tactic: 'Command and Control',
+    tacticId: 'TA0011',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers communicate with compromised systems using standard protocols like HTTPS, DNS, or SMTP to blend C2 traffic with normal network activity.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'C2 over standard protocols evades basic network monitoring, allowing attackers to maintain persistent control and coordinate operations undetected.',
+    boardroomPitch:
+      'Attackers hide their communications inside normal web traffic. Without deep inspection of outbound connections, we cannot distinguish attacker commands from employee browsing.',
+    industryImpacts: [
+      { industry: 'Government', description: 'DNS-based C2 channels bypassing air-gapped network inspection for long-term espionage.' },
+      { industry: 'Manufacturing', description: 'HTTPS-based C2 blending with legitimate cloud service traffic on OT networks.' },
+    ],
+    detectionHints: ['DNS query anomaly detection (length, frequency, entropy)', 'JA3/JA3S TLS fingerprinting', 'Beaconing pattern detection'],
+    mitigations: ['DNS filtering and monitoring', 'TLS inspection', 'Network detection and response (NDR)'],
+    reflectionQuestion: 'Why is DNS particularly attractive as a C2 channel for attackers?',
+    spotTheRisk: 'A workstation generates 10,000 DNS queries per hour to unique subdomains of a single domain. Each subdomain appears to contain encoded data.',
+  },
+  {
+    techniqueId: 'T1573',
+    techniqueName: 'Encrypted Channel',
+    tactic: 'Command and Control',
+    tacticId: 'TA0011',
+    difficulty: 'Advanced',
+    learningPaths: ['Blue Team', 'Red Team'],
+    plainExplanation:
+      'Attackers encrypt their command-and-control communications to prevent network security tools from inspecting the content of their traffic.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'Encrypted C2 channels render content-based network inspection useless, allowing attackers to operate freely unless metadata-based detection is in place.',
+    boardroomPitch:
+      'Attackers encrypt their traffic just like we encrypt ours. Without the ability to inspect encrypted outbound connections, our network security tools are blind.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Custom-encrypted channels evading DLP and network monitoring on trading networks.' },
+      { industry: 'Government', description: 'State-sponsored actors using proprietary encryption to bypass national monitoring infrastructure.' },
+    ],
+    detectionHints: ['TLS certificate anomalies (self-signed, short-lived)', 'JA3 hash matching against known malware profiles', 'Encrypted traffic metadata analysis'],
+    mitigations: ['TLS inspection at network boundary', 'Certificate allowlisting', 'Endpoint-based C2 detection (EDR)'],
+    reflectionQuestion: 'How can organizations detect malicious encrypted traffic without decrypting everything?',
+    spotTheRisk: 'A workstation establishes a TLS connection to an IP address with a self-signed certificate. The JA3 fingerprint matches a known Cobalt Strike beacon profile.',
+  },
+
+  // --- Impact ---
+  {
+    techniqueId: 'T1486',
+    techniqueName: 'Data Encrypted for Impact',
+    tactic: 'Impact',
+    tacticId: 'TA0012',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers encrypt files and systems with ransomware, making data inaccessible until a ransom is paid or backups are restored.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'Ransomware can halt all business operations, destroy data, and result in ransom payments, recovery costs, regulatory fines, and customer lawsuits.',
+    boardroomPitch:
+      'Ransomware is the most financially devastating cyberattack most organizations face. Tested backups and incident response plans are our insurance policy against total operational shutdown.',
+    industryImpacts: [
+      { industry: 'Healthcare', description: 'Hospital systems encrypted, forcing diversion of emergency patients and cancellation of surgeries.' },
+      { industry: 'Manufacturing', description: 'Production lines shut down for weeks while systems are rebuilt from backups.' },
+      { industry: 'Government', description: 'City and county services offline, disrupting 911 dispatch, court systems, and public records.' },
+    ],
+    detectionHints: ['Mass file rename or extension change alerts', 'Canary file monitoring (honeypot files)', 'Volume shadow copy deletion detection'],
+    mitigations: ['Immutable offline backups', 'Network segmentation', 'Endpoint detection with ransomware-specific behavioral rules'],
+    reflectionQuestion: 'Why are tested, offline backups the single most important defense against ransomware?',
+    spotTheRisk: 'At 5 AM, a file server begins renaming thousands of files with a .locked extension. The volume shadow copies are deleted simultaneously.',
+  },
+  {
+    techniqueId: 'T1498',
+    techniqueName: 'Network Denial of Service',
+    tactic: 'Impact',
+    tacticId: 'TA0012',
+    difficulty: 'Beginner',
+    learningPaths: ['Blue Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers flood network resources with traffic to overwhelm systems and make services unavailable to legitimate users.',
+    riskCategory: 'Business Interruption',
+    riskDescription:
+      'DDoS attacks can take customer-facing services offline for hours or days, causing revenue loss and reputational damage.',
+    boardroomPitch:
+      'A DDoS attack can take our website and services offline in minutes. DDoS mitigation services are a cost of doing business for any organization with an internet presence.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Online banking and trading platforms taken offline during critical market hours.' },
+      { industry: 'Retail', description: 'E-commerce sites unavailable during peak shopping periods, causing direct revenue loss.' },
+    ],
+    detectionHints: ['Traffic volume anomaly detection', 'CDN and ISP-level DDoS alerts', 'Application response time degradation'],
+    mitigations: ['DDoS mitigation services (CDN-based)', 'Rate limiting', 'Anycast network distribution'],
+    reflectionQuestion: 'What is the difference between volumetric, protocol, and application-layer DDoS attacks?',
+    spotTheRisk: 'The company website response time jumps from 200ms to 30 seconds. Network monitoring shows a 50x increase in inbound traffic from thousands of source IPs.',
+  },
+  {
+    techniqueId: 'T1485',
+    techniqueName: 'Data Destruction',
+    tactic: 'Impact',
+    tacticId: 'TA0012',
+    difficulty: 'Intermediate',
+    learningPaths: ['Blue Team', 'Purple Team'],
+    plainExplanation:
+      'Attackers deliberately destroy data, databases, or entire systems to cause maximum disruption and deny the organization access to its own information.',
+    riskCategory: 'Direct Financial Loss',
+    riskDescription:
+      'Intentional data destruction can permanently eliminate business records, intellectual property, and operational data — with recovery costs reaching millions.',
+    boardroomPitch:
+      'Unlike ransomware where data can potentially be recovered, data destruction is permanent. Our backup and disaster recovery capabilities directly determine how fast we can resume operations.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Destruction of transaction records requiring costly manual reconstruction and regulatory reporting.' },
+      { industry: 'Government', description: 'Wiper malware destroying agency databases and citizen records as part of geopolitical conflict.' },
+    ],
+    detectionHints: ['Mass file deletion alerts', 'Disk wipe tool execution detection', 'Database drop/truncate command monitoring'],
+    mitigations: ['Immutable backup storage', 'Disaster recovery testing', 'Least privilege on database and file server access'],
+    reflectionQuestion: 'How does a wiper attack differ from ransomware in terms of attacker motivation and organizational recovery?',
+    spotTheRisk: 'A compromised admin account executes a script that truncates all tables in the production database and then wipes the backup server.',
+  },
+
+  // --- Reconnaissance ---
+  {
+    techniqueId: 'T1593',
+    techniqueName: 'Search Open Websites/Domains',
+    tactic: 'Reconnaissance',
+    tacticId: 'TA0043',
+    difficulty: 'Beginner',
+    learningPaths: ['Red Team', 'GRC Focus'],
+    plainExplanation:
+      'Attackers search public websites, social media, and domain records to gather information about the target organization before launching an attack.',
+    riskCategory: 'Loss of Confidence',
+    riskDescription:
+      'Public information leakage gives attackers intelligence about employees, technologies, and organizational structure — enabling more targeted and effective attacks.',
+    boardroomPitch:
+      'Everything we post publicly — job listings, social media, conference talks — gives attackers intelligence to craft targeted attacks. Information governance extends beyond our firewall.',
+    industryImpacts: [
+      { industry: 'Technology', description: 'Job postings revealing specific technology stacks and security tools, enabling attackers to tailor exploits.' },
+      { industry: 'Financial Services', description: 'LinkedIn profiles identifying key personnel for executive-targeted spearphishing.' },
+    ],
+    detectionHints: ['Cannot typically be detected (pre-compromise activity)', 'Monitor for credential leaks on dark web', 'Track organizational mentions on paste sites'],
+    mitigations: ['OPSEC awareness training', 'Review public-facing information policies', 'Limit technology details in job postings'],
+    reflectionQuestion: 'Why is reconnaissance almost impossible to detect, and how does that change our defensive strategy?',
+    spotTheRisk: 'A job posting for "Senior Security Engineer" lists the exact SIEM, EDR, and firewall vendors used by the organization.',
+  },
+
+  // --- Resource Development ---
+  {
+    techniqueId: 'T1588',
+    techniqueName: 'Obtain Capabilities',
+    tactic: 'Resource Development',
+    tacticId: 'TA0042',
+    difficulty: 'Advanced',
+    learningPaths: ['Purple Team', 'Red Team'],
+    plainExplanation:
+      'Attackers acquire or develop tools, exploits, and infrastructure before launching an attack — including purchasing malware, exploits, or stolen credentials.',
+    riskCategory: 'Market Misconduct',
+    riskDescription:
+      'The availability of commoditized attack tools and stolen credential marketplaces lowers the barrier to entry for sophisticated attacks against any organization.',
+    boardroomPitch:
+      'Attackers can buy ready-made hacking tools and stolen credentials on underground markets. We must assume capable adversaries and invest in detection, not just prevention.',
+    industryImpacts: [
+      { industry: 'Financial Services', description: 'Purchased zero-day exploits targeting banking applications for financial fraud.' },
+      { industry: 'Government', description: 'State-sponsored acquisition of commercial spyware for surveillance operations.' },
+    ],
+    detectionHints: ['Threat intelligence feeds for new exploit availability', 'Dark web monitoring for organizational credentials', 'Vulnerability correlation with known exploit markets'],
+    mitigations: ['Threat intelligence program', 'Proactive vulnerability management', 'Assume-breach security architecture'],
+    reflectionQuestion: 'How does the commercialization of cyber attack tools change the threat landscape for organizations?',
+    spotTheRisk: 'Threat intelligence reports that a zero-day exploit for your primary VPN vendor is being sold on a dark web marketplace for $50,000.',
+  },
+];
+
+export default techniques;
