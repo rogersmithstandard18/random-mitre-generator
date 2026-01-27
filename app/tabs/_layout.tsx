@@ -21,11 +21,11 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Random",
+          title: "MITRE ATT&CK",
           headerRight: () => (
-            <Menu 
-              size={24} 
-              color={colors.text} 
+            <Menu
+              size={24}
+              color={colors.text}
               style={{ marginRight: 16 }}
             />
           ),
@@ -34,11 +34,24 @@ export default function TabLayout() {
       <Tabs.Screen
         name="topic"
         options={{
-          title: "Random",
+          title: "Translation Card",
           headerRight: () => (
-            <Menu 
-              size={24} 
-              color={colors.text} 
+            <Menu
+              size={24}
+              color={colors.text}
+              style={{ marginRight: 16 }}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: "My Learning",
+          headerRight: () => (
+            <Menu
+              size={24}
+              color={colors.text}
               style={{ marginRight: 16 }}
             />
           ),
