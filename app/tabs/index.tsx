@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { useTopicStore } from '@/store/topicStore';
-import Button from '@/components/Button';
+import Button from '@/components/buttons';
 import FilterBar from '@/components/FilterBar';
 import colors from '@/constants/colors';
 import * as Haptics from 'expo-haptics';

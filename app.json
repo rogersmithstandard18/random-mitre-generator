@@ -25,7 +25,8 @@
       "package": "app.rork.random-topic-generator"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
     },
     "plugins": [
       [
