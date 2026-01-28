@@ -15,6 +15,7 @@ A modern web application designed to help security professionals, students, and 
   - **MITRE Tactic**: From Reconnaissance to Impact.
 - **History & Favorites**: Keep track of recently viewed techniques and save your favorites for later review.
 - **Responsive Design**: Fully responsive UI for learning on the go.
+- **Future development with red team blue team assignment
 
 ## 🛠️ Tech Stack
 
