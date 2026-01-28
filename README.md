@@ -49,6 +49,12 @@ A modern web application designed to help security professionals, students, and 
    npm run build
    ```
 
+## 🔮 Future Development
+
+- **Team Assignments**: Specialized learning paths and interactive assignments for **Blue Team** and **Red Team** roles.
+- **Progress Tracking**: User accounts and progress saving for personal learning journeys.
+- **Interactive Quizzes**: Test your knowledge of MITRE techniques.
+
 ## 📄 License
 
 Private/Internal use.
