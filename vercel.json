@@ -2,10 +2,9 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/((?!assets/|favicon.png|.*\\.).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
