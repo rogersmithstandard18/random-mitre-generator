@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
 import { useTopicStore } from '@/store/topicStore';
-import Button from '@/components/Button';
+import Button from '@/components/buttons';
 import TopicCard from '@/components/TopicCard';
 import TranslationCardView from '@/components/TranslationCardView';
 import colors from '@/constants/colors';
