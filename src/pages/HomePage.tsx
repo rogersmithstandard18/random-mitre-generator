@@ -15,7 +15,7 @@ export default function HomePage() {
   return (
     <div>
       <div className="home-hero">
-        <h1>MITRE ATT&CK Learning Tool</h1>
+        <h1>CyberSecurity Learning Tool</h1>
         <p>
           Master cybersecurity techniques through plain-language translation cards.
           Learn one concept at a time.
