@@ -879,10 +879,129 @@ a {
   color: #888;
 }
 
+/* Pricing Section */
+.sales-pricing-subheadline {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin: -32px 0 48px 0;
+}
+
+.sales-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.sales-pricing-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sales-pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.sales-pricing-card-highlighted {
+  border-color: #FF5252;
+  transform: scale(1.02);
+}
+
+.sales-pricing-card-highlighted:hover {
+  transform: scale(1.02) translateY(-4px);
+}
+
+.sales-pricing-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sales-pricing-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin: 8px 0 8px 0;
+}
+
+.sales-pricing-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.sales-pricing-price {
+  margin-bottom: 24px;
+}
+
+.sales-pricing-currency {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  vertical-align: top;
+}
+
+.sales-pricing-amount {
+  font-size: 56px;
+  font-weight: 800;
+  color: #222;
+  line-height: 1;
+}
+
+.sales-pricing-period {
+  font-size: 16px;
+  color: #888;
+}
+
+.sales-pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  text-align: left;
+}
+
+.sales-pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.sales-pricing-features li svg {
+  color: #4CAF50;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
 /* Responsive for Sales Components */
 @media (max-width: 900px) {
   .sales-grid-3 {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sales-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .sales-pricing-card-highlighted {
+    transform: none;
+  }
+
+  .sales-pricing-card-highlighted:hover {
+    transform: translateY(-4px);
   }
 
   .sales-headline {
@@ -920,6 +1039,10 @@ a {
   .sales-btn-lg {
     padding: 14px 24px;
     font-size: 16px;
+  }
+
+  .sales-pricing-amount {
+    font-size: 48px;
   }
 }
 

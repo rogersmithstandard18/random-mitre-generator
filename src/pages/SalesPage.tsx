@@ -1,6 +1,7 @@
 import { HeroSection } from '../components/sales/HeroSection';
 import { FeaturesSection } from '../components/sales/FeaturesSection';
 import { TestimonialsSection } from '../components/sales/TestimonialsSection';
+import { PricingSection } from '../components/sales/PricingSection';
 
 export function SalesPage() {
   return (
@@ -8,7 +9,7 @@ export function SalesPage() {
       <HeroSection />
       <FeaturesSection />
       <TestimonialsSection />
-      {/* Phase 4: PricingSection */}
+      <PricingSection />
       {/* Phase 5: FAQSection, SalesFooter */}
     </div>
   );
