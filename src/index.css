@@ -563,6 +563,242 @@ a {
   background: #e04848;
 }
 
+/* ==========================================
+   SALES PAGE STYLES
+   ========================================== */
+
+/* Sales Button Base */
+.sales-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+
+/* Button Variants */
+.sales-btn-primary {
+  background: #FF5252;
+  color: #fff;
+  border-color: #FF5252;
+}
+
+.sales-btn-primary:hover {
+  background: #e04848;
+  border-color: #e04848;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 82, 82, 0.3);
+}
+
+.sales-btn-secondary {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+.sales-btn-secondary:hover {
+  background: #333;
+  border-color: #333;
+  transform: translateY(-1px);
+}
+
+.sales-btn-outline {
+  background: transparent;
+  color: #222;
+  border-color: #ddd;
+}
+
+.sales-btn-outline:hover {
+  border-color: #FF5252;
+  color: #FF5252;
+}
+
+/* Button Sizes */
+.sales-btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.sales-btn-md {
+  padding: 12px 24px;
+  font-size: 15px;
+}
+
+.sales-btn-lg {
+  padding: 16px 32px;
+  font-size: 17px;
+}
+
+/* Button Modifiers */
+.sales-btn-full {
+  width: 100%;
+}
+
+.sales-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sales Section */
+.sales-section {
+  width: 100%;
+  padding: 64px 20px;
+}
+
+.sales-section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sales-section-white {
+  background: #fff;
+}
+
+.sales-section-gray {
+  background: #f8f9fa;
+}
+
+.sales-section-dark {
+  background: #222;
+  color: #fff;
+}
+
+/* Sales Badge */
+.sales-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sales-badge-primary {
+  background: #FF5252;
+  color: #fff;
+}
+
+.sales-badge-success {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.sales-badge-warning {
+  background: #FF9800;
+  color: #fff;
+}
+
+/* Sales Typography */
+.sales-headline {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.sales-subheadline {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.sales-section-title {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 48px;
+  color: #222;
+}
+
+.sales-section-dark .sales-section-title {
+  color: #fff;
+}
+
+/* Sales Grid Layouts */
+.sales-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.sales-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Sales Card Base */
+.sales-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.sales-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive for Sales Components */
+@media (max-width: 900px) {
+  .sales-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sales-headline {
+    font-size: 32px;
+  }
+
+  .sales-section-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sales-section {
+    padding: 48px 16px;
+  }
+
+  .sales-grid-2,
+  .sales-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-headline {
+    font-size: 28px;
+  }
+
+  .sales-subheadline {
+    font-size: 16px;
+  }
+
+  .sales-section-title {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+
+  .sales-btn-lg {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+}
+
+/* ==========================================
+   END SALES PAGE STYLES
+   ========================================== */
+
 /* Responsive */
 @media (max-width: 600px) {
   .page {
