@@ -13,7 +13,7 @@ function AppContent() {
       <nav className="navbar">
         <NavLink to="/" className="navbar-brand">
           <Shield size={20} />
-          MITRE ATT&CK Learner
+          CyberSecurity Learner
         </NavLink>
         <div className="navbar-links">
           <NavLink to="/" end>Home</NavLink>
