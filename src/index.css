@@ -984,6 +984,154 @@ a {
   margin-top: 2px;
 }
 
+/* FAQ Section */
+.sales-faq-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.sales-faq-item {
+  border-bottom: 1px solid #eee;
+}
+
+.sales-faq-item:last-child {
+  border-bottom: none;
+}
+
+.sales-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  transition: color 0.2s;
+}
+
+.sales-faq-question:hover {
+  color: #FF5252;
+}
+
+.sales-faq-chevron {
+  color: #888;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.sales-faq-chevron.open {
+  transform: rotate(180deg);
+}
+
+.sales-faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.sales-faq-answer.open {
+  max-height: 300px;
+  padding-bottom: 20px;
+}
+
+.sales-faq-answer p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  margin: 0;
+}
+
+/* Final CTA Section */
+.sales-final-cta-content {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sales-final-cta-headline {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.sales-final-cta-subheadline {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 32px;
+}
+
+/* Footer */
+.sales-footer {
+  background: #111;
+  color: #fff;
+  padding: 48px 20px 32px;
+}
+
+.sales-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sales-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-bottom: 48px;
+}
+
+.sales-footer-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin-bottom: 16px;
+}
+
+.sales-footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sales-footer-section li {
+  margin-bottom: 10px;
+}
+
+.sales-footer-section a {
+  color: #ccc;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.sales-footer-section a:hover {
+  color: #FF5252;
+}
+
+.sales-footer-bottom {
+  border-top: 1px solid #333;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.sales-footer-bottom p {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 4px 0;
+}
+
+.sales-footer-disclaimer {
+  font-size: 12px;
+  color: #555;
+}
+
 /* Responsive for Sales Components */
 @media (max-width: 900px) {
   .sales-grid-3 {
@@ -1009,6 +1157,15 @@ a {
   }
 
   .sales-section-title {
+    font-size: 28px;
+  }
+
+  .sales-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .sales-final-cta-headline {
     font-size: 28px;
   }
 }
@@ -1043,6 +1200,24 @@ a {
 
   .sales-pricing-amount {
     font-size: 48px;
+  }
+
+  .sales-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    text-align: center;
+  }
+
+  .sales-final-cta-headline {
+    font-size: 24px;
+  }
+
+  .sales-final-cta-subheadline {
+    font-size: 16px;
+  }
+
+  .sales-faq-question {
+    font-size: 15px;
   }
 }
 

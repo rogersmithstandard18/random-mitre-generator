@@ -23,3 +23,6 @@ export { TestimonialCard } from './TestimonialCard';
 export { TestimonialsSection } from './TestimonialsSection';
 export { PricingCard } from './PricingCard';
 export { PricingSection } from './PricingSection';
+export { FAQItem } from './FAQItem';
+export { FAQSection } from './FAQSection';
+export { SalesFooter } from './SalesFooter';
