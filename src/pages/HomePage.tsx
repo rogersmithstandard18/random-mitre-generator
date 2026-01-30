@@ -17,7 +17,7 @@ export default function HomePage() {
       <div className="home-hero">
         <h1>CyberSecurity Learning Tool</h1>
         <p>
-          Master cybersecurity techniques through plain-language translation cards.
+          Master cyberSecurity techniques through plain-language translation cards.
           Learn one concept at a time.
         </p>
         <button className="generate-btn" onClick={handleGenerate}>
