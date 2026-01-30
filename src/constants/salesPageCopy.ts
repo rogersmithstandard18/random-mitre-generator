@@ -7,7 +7,7 @@
 
 export const salesPageCopy = {
   hero: {
-    headline: "Master MITRE ATT&CK Through Translation",
+    headline: "Master Cybersecurity Through Translation",
     subheadline:
       "Stop memorizing techniques. Start understanding them. Our flashcard system translates complex cybersecurity concepts into plain language, risk categories, and business impact.",
     benefits: [
@@ -21,7 +21,7 @@ export const salesPageCopy = {
   },
 
   features: {
-    headline: "Everything You Need to Master MITRE ATT&CK",
+    headline: "Everything You Need to Master Cybersecurity",
     items: [
       {
         title: "Plain English Translation",
@@ -153,11 +153,7 @@ export const salesPageCopy = {
   faq: {
     headline: "Frequently Asked Questions",
     items: [
-      {
-        question: "How is this different from the MITRE website?",
-        answer:
-          "MITRE provides comprehensive technical documentation. We translate that into plain language, add business context, and structure it for learning—not reference.",
-      },
+     
       {
         question: "Can I use this for certification prep?",
         answer:
@@ -188,16 +184,12 @@ export const salesPageCopy = {
         answer:
           "Yes, you can cancel your subscription at any time. You'll retain access until the end of your billing period.",
       },
-      {
-        question: "Do you offer student discounts?",
-        answer:
-          "Yes! Students with a valid .edu email address receive 50% off any plan. Contact support to apply.",
-      },
+  
     ],
   },
 
   footer: {
-    ctaHeadline: "Ready to Master MITRE ATT&CK?",
+    ctaHeadline: "Ready to Master Cybersecurity?",
     ctaSubheadline:
       "Join thousands of security professionals learning the smart way.",
     ctaButton: "Start Your Free Trial",
@@ -219,7 +211,7 @@ export const salesPageCopy = {
         { label: "Terms of Service", href: "#" },
       ],
     },
-    copyright: "© 2024 MITRE ATT&CK Translator. All rights reserved.",
+    copyright: "© 2026 Cybersecurity Translator. All rights reserved.",
     disclaimer: "Not affiliated with MITRE Corporation.",
   },
 };
