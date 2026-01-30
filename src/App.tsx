@@ -3,6 +3,7 @@ import { Shield } from 'lucide-react';
 import HomePage from './pages/HomePage';
 import CardPage from './pages/CardPage';
 import HistoryPage from './pages/HistoryPage';
+import { SalesPage } from './pages/SalesPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           </div>
           <div className="navbar-links">
             <NavLink to="/" end>Home</NavLink>
+            <NavLink to="/sales">Sales</NavLink>
             <NavLink to="/learn">Learn</NavLink>
             <NavLink to="/history">History</NavLink>
           </div>
@@ -22,6 +24,7 @@ function App() {
         <div className="page">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/sales" element={<SalesPage />} />
             <Route path="/learn" element={<CardPage />} />
             <Route path="/history" element={<HistoryPage />} />
           </Routes>

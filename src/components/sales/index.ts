@@ -14,3 +14,6 @@ export type {
   SalesBadgeProps,
   BadgeVariant,
 } from './shared';
+
+// Section Components
+export { HeroSection } from './HeroSection';

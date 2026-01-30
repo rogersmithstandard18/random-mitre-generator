@@ -751,6 +751,53 @@ a {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
+/* Sales Page Layout */
+.sales-page {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.sales-hero {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.sales-hero-content {
+  max-width: 700px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.sales-hero-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.sales-hero-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #444;
+}
+
+.sales-hero-benefits li svg {
+  color: #4CAF50;
+  flex-shrink: 0;
+}
+
+.sales-hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 /* Responsive for Sales Components */
 @media (max-width: 900px) {
   .sales-grid-3 {
