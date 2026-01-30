@@ -798,6 +798,87 @@ a {
   flex-wrap: wrap;
 }
 
+/* Feature Card */
+.sales-feature-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.sales-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.sales-feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #FF5252;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.sales-feature-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.sales-feature-description {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Testimonial Card */
+.sales-testimonial-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.sales-testimonial-quote-icon {
+  color: #FF5252;
+  opacity: 0.3;
+  margin-bottom: 12px;
+}
+
+.sales-testimonial-quote {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+  margin: 0 0 20px 0;
+  font-style: italic;
+}
+
+.sales-testimonial-author {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sales-testimonial-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.sales-testimonial-role {
+  font-size: 13px;
+  color: #888;
+}
+
 /* Responsive for Sales Components */
 @media (max-width: 900px) {
   .sales-grid-3 {

@@ -17,3 +17,7 @@ export type {
 
 // Section Components
 export { HeroSection } from './HeroSection';
+export { FeatureCard } from './FeatureCard';
+export { FeaturesSection } from './FeaturesSection';
+export { TestimonialCard } from './TestimonialCard';
+export { TestimonialsSection } from './TestimonialsSection';
