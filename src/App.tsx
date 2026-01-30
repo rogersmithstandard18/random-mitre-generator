@@ -1,32 +1,46 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { Shield } from 'lucide-react';
-import HomePage from './pages/HomePage';
 import CardPage from './pages/CardPage';
 import HistoryPage from './pages/HistoryPage';
+import { SalesPage } from './pages/SalesPage';
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  const isSalesPage = location.pathname === '/';
+
   return (
-    <BrowserRouter>
-      <div className="app">
-        <nav className="navbar">
-          <div className="navbar-brand">
-            <Shield size={20} />
-            MITRE ATT&CK Learner
-          </div>
-          <div className="navbar-links">
-            <NavLink to="/" end>Home</NavLink>
-            <NavLink to="/learn">Learn</NavLink>
-            <NavLink to="/history">History</NavLink>
-          </div>
-        </nav>
+    <div className="app">
+      <nav className="navbar">
+        <NavLink to="/" className="navbar-brand">
+          <Shield size={20} />
+          MITRE ATT&CK Learner
+        </NavLink>
+        <div className="navbar-links">
+          <NavLink to="/" end>Home</NavLink>
+          <NavLink to="/learn">Learn</NavLink>
+          <NavLink to="/history">History</NavLink>
+        </div>
+      </nav>
+      {isSalesPage ? (
+        <Routes>
+          <Route path="/" element={<SalesPage />} />
+        </Routes>
+      ) : (
         <div className="page">
           <Routes>
-            <Route path="/" element={<HomePage />} />
             <Route path="/learn" element={<CardPage />} />
             <Route path="/history" element={<HistoryPage />} />
           </Routes>
         </div>
-      </div>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

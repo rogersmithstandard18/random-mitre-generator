@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, sans-serif;
@@ -562,6 +566,668 @@ a {
 .next-btn:hover {
   background: #e04848;
 }
+
+/* ==========================================
+   SALES PAGE STYLES
+   ========================================== */
+
+/* Sales Button Base */
+.sales-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+  white-space: nowrap;
+}
+
+/* Button Variants */
+.sales-btn-primary {
+  background: #FF5252;
+  color: #fff;
+  border-color: #FF5252;
+}
+
+.sales-btn-primary:hover {
+  background: #e04848;
+  border-color: #e04848;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 82, 82, 0.3);
+}
+
+.sales-btn-secondary {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
+.sales-btn-secondary:hover {
+  background: #333;
+  border-color: #333;
+  transform: translateY(-1px);
+}
+
+.sales-btn-outline {
+  background: transparent;
+  color: #222;
+  border-color: #ddd;
+}
+
+.sales-btn-outline:hover {
+  border-color: #FF5252;
+  color: #FF5252;
+}
+
+/* Button Sizes */
+.sales-btn-sm {
+  padding: 8px 16px;
+  font-size: 14px;
+}
+
+.sales-btn-md {
+  padding: 12px 24px;
+  font-size: 15px;
+}
+
+.sales-btn-lg {
+  padding: 16px 32px;
+  font-size: 17px;
+}
+
+/* Button Modifiers */
+.sales-btn-full {
+  width: 100%;
+}
+
+.sales-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Sales Section */
+.sales-section {
+  width: 100%;
+  padding: 64px 20px;
+}
+
+.sales-section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sales-section-white {
+  background: #fff;
+}
+
+.sales-section-gray {
+  background: #f8f9fa;
+}
+
+.sales-section-dark {
+  background: #222;
+  color: #fff;
+}
+
+/* Sales Badge */
+.sales-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sales-badge-primary {
+  background: #FF5252;
+  color: #fff;
+}
+
+.sales-badge-success {
+  background: #4CAF50;
+  color: #fff;
+}
+
+.sales-badge-warning {
+  background: #FF9800;
+  color: #fff;
+}
+
+/* Sales Typography */
+.sales-headline {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #222;
+  margin-bottom: 16px;
+}
+
+.sales-subheadline {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.sales-section-title {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 48px;
+  color: #222;
+}
+
+.sales-section-dark .sales-section-title {
+  color: #fff;
+}
+
+/* Sales Grid Layouts */
+.sales-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.sales-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* Sales Card Base */
+.sales-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.sales-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Sales Page Layout */
+.sales-page {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.sales-hero {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+.sales-hero-content {
+  max-width: 700px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.sales-hero-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px 0;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.sales-hero-benefits li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: #444;
+}
+
+.sales-hero-benefits li svg {
+  color: #4CAF50;
+  flex-shrink: 0;
+}
+
+.sales-hero-cta {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Feature Card */
+.sales-feature-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.sales-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.sales-feature-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: #FF5252;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.sales-feature-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 8px;
+}
+
+.sales-feature-description {
+  font-size: 15px;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Testimonial Card */
+.sales-testimonial-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+}
+
+.sales-testimonial-quote-icon {
+  color: #FF5252;
+  opacity: 0.3;
+  margin-bottom: 12px;
+}
+
+.sales-testimonial-quote {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #444;
+  margin: 0 0 20px 0;
+  font-style: italic;
+}
+
+.sales-testimonial-author {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sales-testimonial-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+.sales-testimonial-role {
+  font-size: 13px;
+  color: #888;
+}
+
+/* Pricing Section */
+.sales-pricing-subheadline {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin: -32px 0 48px 0;
+}
+
+.sales-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.sales-pricing-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  position: relative;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.sales-pricing-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.sales-pricing-card-highlighted {
+  border-color: #FF5252;
+  transform: scale(1.02);
+}
+
+.sales-pricing-card-highlighted:hover {
+  transform: scale(1.02) translateY(-4px);
+}
+
+.sales-pricing-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.sales-pricing-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin: 8px 0 8px 0;
+}
+
+.sales-pricing-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px 0;
+}
+
+.sales-pricing-price {
+  margin-bottom: 24px;
+}
+
+.sales-pricing-currency {
+  font-size: 24px;
+  font-weight: 700;
+  color: #222;
+  vertical-align: top;
+}
+
+.sales-pricing-amount {
+  font-size: 56px;
+  font-weight: 800;
+  color: #222;
+  line-height: 1;
+}
+
+.sales-pricing-period {
+  font-size: 16px;
+  color: #888;
+}
+
+.sales-pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  text-align: left;
+}
+
+.sales-pricing-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.sales-pricing-features li svg {
+  color: #4CAF50;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* FAQ Section */
+.sales-faq-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.sales-faq-item {
+  border-bottom: 1px solid #eee;
+}
+
+.sales-faq-item:last-child {
+  border-bottom: none;
+}
+
+.sales-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  transition: color 0.2s;
+}
+
+.sales-faq-question:hover {
+  color: #FF5252;
+}
+
+.sales-faq-chevron {
+  color: #888;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.sales-faq-chevron.open {
+  transform: rotate(180deg);
+}
+
+.sales-faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.sales-faq-answer.open {
+  max-height: 300px;
+  padding-bottom: 20px;
+}
+
+.sales-faq-answer p {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+  margin: 0;
+}
+
+/* Final CTA Section */
+.sales-final-cta-content {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sales-final-cta-headline {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.sales-final-cta-subheadline {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 32px;
+}
+
+/* Footer */
+.sales-footer {
+  background: #111;
+  color: #fff;
+  padding: 48px 20px 32px;
+}
+
+.sales-footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sales-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-bottom: 48px;
+}
+
+.sales-footer-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin-bottom: 16px;
+}
+
+.sales-footer-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sales-footer-section li {
+  margin-bottom: 10px;
+}
+
+.sales-footer-section a {
+  color: #ccc;
+  font-size: 14px;
+  transition: color 0.2s;
+}
+
+.sales-footer-section a:hover {
+  color: #FF5252;
+}
+
+.sales-footer-bottom {
+  border-top: 1px solid #333;
+  padding-top: 24px;
+  text-align: center;
+}
+
+.sales-footer-bottom p {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 4px 0;
+}
+
+.sales-footer-disclaimer {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Responsive for Sales Components */
+@media (max-width: 900px) {
+  .sales-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sales-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .sales-pricing-card-highlighted {
+    transform: none;
+  }
+
+  .sales-pricing-card-highlighted:hover {
+    transform: translateY(-4px);
+  }
+
+  .sales-headline {
+    font-size: 32px;
+  }
+
+  .sales-section-title {
+    font-size: 28px;
+  }
+
+  .sales-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+
+  .sales-final-cta-headline {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sales-section {
+    padding: 48px 16px;
+  }
+
+  .sales-grid-2,
+  .sales-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .sales-headline {
+    font-size: 28px;
+  }
+
+  .sales-subheadline {
+    font-size: 16px;
+  }
+
+  .sales-section-title {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+
+  .sales-btn-lg {
+    padding: 14px 24px;
+    font-size: 16px;
+  }
+
+  .sales-pricing-amount {
+    font-size: 48px;
+  }
+
+  .sales-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    text-align: center;
+  }
+
+  .sales-final-cta-headline {
+    font-size: 24px;
+  }
+
+  .sales-final-cta-subheadline {
+    font-size: 16px;
+  }
+
+  .sales-faq-question {
+    font-size: 15px;
+  }
+}
+
+/* ==========================================
+   END SALES PAGE STYLES
+   ========================================== */
 
 /* Responsive */
 @media (max-width: 600px) {
