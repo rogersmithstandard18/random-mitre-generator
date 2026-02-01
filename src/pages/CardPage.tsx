@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTopicStore } from '@/store/topicStore';
 import TranslationCardView from '@/components/TranslationCardView';
+import FilterBar from '@/components/FilterBar';
 
 export default function CardPage() {
   const currentCard = useTopicStore(s => s.currentCard);
@@ -22,6 +23,7 @@ export default function CardPage() {
 
   return (
     <div>
+      <FilterBar />
       <TranslationCardView card={currentCard} />
       <button className="next-btn" onClick={generateRandomCard}>
         NEXT CONCEPT
