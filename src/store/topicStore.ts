@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import techniques from '@/constants/techniques';
 import { TranslationCard, Difficulty, LearningPath, MitreTactic } from '@/types/TranslationCard';
+import { useAuthStore } from './authStore';
 
 interface Filters {
   difficulty: Difficulty | null;
@@ -37,6 +38,28 @@ function getFilteredTechniques(filters: Filters): TranslationCard[] {
   return pool;
 }
 
+async function syncToBackend(state: { cardHistory?: TranslationCard[]; favorites?: string[]; showAdvanced?: boolean }) {
+  const token = useAuthStore.getState().token;
+  if (!token) return;
+
+  try {
+    await fetch('/api/user/sync', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        cardHistory: state.cardHistory,
+        favorites: state.favorites,
+        showAdvanced: state.showAdvanced,
+      }),
+    });
+  } catch (error) {
+    console.error('Sync failed:', error);
+  }
+}
+
 export const useTopicStore = create<TopicState>()(
   persist(
     (set, get) => ({
@@ -56,10 +79,14 @@ export const useTopicStore = create<TopicState>()(
         const candidates = available.length > 0 ? available : pool;
         const card = candidates[Math.floor(Math.random() * candidates.length)];
 
-        set(state => ({
-          currentCard: card,
-          cardHistory: [card, ...state.cardHistory].slice(0, 50),
-        }));
+        set(state => {
+          const newCardHistory = [card, ...state.cardHistory].slice(0, 50);
+          syncToBackend({ cardHistory: newCardHistory, favorites: state.favorites, showAdvanced: state.showAdvanced });
+          return {
+            currentCard: card,
+            cardHistory: newCardHistory,
+          };
+        });
       },
 
       setFilter: (key, value) => {
@@ -73,15 +100,23 @@ export const useTopicStore = create<TopicState>()(
       },
 
       toggleFavorite: (techniqueId: string) => {
-        set(state => ({
-          favorites: state.favorites.includes(techniqueId)
+        set(state => {
+          const newFavorites = state.favorites.includes(techniqueId)
             ? state.favorites.filter(id => id !== techniqueId)
-            : [...state.favorites, techniqueId],
-        }));
+            : [...state.favorites, techniqueId];
+
+          syncToBackend({ cardHistory: state.cardHistory, favorites: newFavorites, showAdvanced: state.showAdvanced });
+
+          return { favorites: newFavorites };
+        });
       },
 
       toggleAdvanced: () => {
-        set(state => ({ showAdvanced: !state.showAdvanced }));
+        set(state => {
+          const newShowAdvanced = !state.showAdvanced;
+          syncToBackend({ cardHistory: state.cardHistory, favorites: state.favorites, showAdvanced: newShowAdvanced });
+          return { showAdvanced: newShowAdvanced };
+        });
       },
     }),
     {

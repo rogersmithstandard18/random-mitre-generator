@@ -1,9 +1,12 @@
 import { CheckCircle } from 'lucide-react';
 import { salesPageCopy } from '../../constants/salesPageCopy';
 import { SalesButton, SalesSection } from './shared';
+import { GoogleLoginButton } from '../auth/GoogleLoginButton';
+import { useAuthStore } from '@/store/authStore';
 
 export function HeroSection() {
   const { hero } = salesPageCopy;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const scrollToPricing = () => {
     const pricingSection = document.getElementById('pricing');
@@ -28,9 +31,15 @@ export function HeroSection() {
         </ul>
 
         <div className="sales-hero-cta">
-          <SalesButton variant="primary" size="lg" to="/learn">
-            {hero.primaryCTA}
-          </SalesButton>
+          {isAuthenticated ? (
+            <SalesButton variant="primary" size="lg" to="/learn">
+              {hero.primaryCTA}
+            </SalesButton>
+          ) : (
+            <div className="google-login-wrapper">
+              <GoogleLoginButton />
+            </div>
+          )}
           <SalesButton variant="outline" size="lg" onClick={scrollToPricing}>
             {hero.secondaryCTA}
           </SalesButton>
