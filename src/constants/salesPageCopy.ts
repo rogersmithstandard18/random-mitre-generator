@@ -98,51 +98,62 @@ export const salesPageCopy = {
 
   pricing: {
     headline: "Choose Your Learning Path",
-    subheadline: "Start with a 7-day free trial. No credit card required.",
+    subheadline: "Start free and upgrade when you're ready.",
     tiers: [
       {
-        name: "Foundation",
+        name: "Free",
+        price: 0,
+        period: "month" as const,
+        description: "Get started with random learning",
+        features: [
+          "Random technique cards",
+          "Plain language explanations",
+          "Boardroom translations",
+          "Industry impact examples",
+        ],
+        cta: "Sign Up Free",
+        highlighted: false,
+      },
+      {
+        name: "Starter",
         price: 9,
         period: "month" as const,
         description: "Perfect for students and beginners",
         features: [
-          "Access to all techniques",
-          "Plain language explanations",
-          "Boardroom translations",
-          "Industry impact examples",
-          "Basic filtering",
+          "Everything in Free",
+          "Basic filtering (difficulty & tactic)",
+          "Favorites & history tracking",
+          "Detection hints & mitigations",
         ],
-        cta: "Get Started",
+        cta: "Start Learning",
         highlighted: false,
       },
       {
-        name: "Core",
+        name: "Professional",
         price: 29,
         period: "month" as const,
         description: "For security professionals",
         features: [
-          "Everything in Foundation",
-          "Detection hints & mitigations",
+          "Everything in Starter",
           "Advanced filtering by learning path",
-          "Favorites & history tracking",
+          "Blue Team / Red Team / Purple Team paths",
           "Priority support",
         ],
-        cta: "Start Core",
+        cta: "Go Professional",
         highlighted: true,
         badge: "Most Popular",
       },
       {
-        name: "Premium",
+        name: "Team",
         price: 79,
         period: "month" as const,
         description: "For teams and organizations",
         features: [
-          "Everything in Core",
+          "Everything in Professional",
           "Team collaboration features",
           "Custom learning paths",
           "API access",
           "Dedicated support",
-          "Quarterly updates",
         ],
         cta: "Contact Sales",
         highlighted: false,
@@ -170,9 +181,9 @@ export const salesPageCopy = {
           "We update techniques quarterly to reflect MITRE ATT&CK updates and evolving threat landscape.",
       },
       {
-        question: "Is there a free trial?",
+        question: "Is there a free tier?",
         answer:
-          "We offer a 7-day free trial of the Core tier. No credit card required.",
+          "Yes! Our Free tier gives you access to random technique cards with full explanations. Upgrade anytime to unlock filtering and more features.",
       },
       {
         question: "What payment methods do you accept?",
@@ -192,7 +203,7 @@ export const salesPageCopy = {
     ctaHeadline: "Ready to Master Cybersecurity?",
     ctaSubheadline:
       "Join thousands of security professionals learning the smart way.",
-    ctaButton: "Start Your Free Trial",
+    ctaButton: "Get Started Free",
     links: {
       product: [
         { label: "Features", href: "#features" },

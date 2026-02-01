@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Filter } from 'lucide-react';
+import { Filter, Lock } from 'lucide-react';
 import { useTopicStore } from '@/store/topicStore';
+import { useAuthStore } from '@/store/authStore';
 import { learningPathConfigs, difficultyConfigs } from '@/constants/learningPaths';
 import { MitreTactic } from '@/types/TranslationCard';
 
@@ -16,8 +17,23 @@ export default function FilterBar() {
   const filters = useTopicStore(s => s.filters);
   const setFilter = useTopicStore(s => s.setFilter);
   const clearFilters = useTopicStore(s => s.clearFilters);
+  const getTierFeatures = useAuthStore(s => s.getTierFeatures);
+
+  const features = getTierFeatures();
+  const canUseFilters = features.canUseFilters;
+  const canUseLearningPathFilter = features.canUseLearningPathFilter;
 
   const hasFilters = filters.difficulty || filters.learningPath || filters.tactic;
+
+  // Don't show filter bar at all for free tier
+  if (!canUseFilters) {
+    return (
+      <div className="filter-locked">
+        <Lock size={14} />
+        <span>Upgrade to unlock filters</span>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -31,15 +47,24 @@ export default function FilterBar() {
 
       {open && (
         <div className="filter-bar">
+          {/* Learning Path - only for Professional tier and above */}
           <div className="filter-section">
-            <label>Learning Path</label>
+            <label>
+              Learning Path
+              {!canUseLearningPathFilter && <Lock size={12} style={{ marginLeft: 6 }} />}
+            </label>
             <div className="filter-chips">
               {learningPathConfigs.map(lp => (
                 <span
                   key={lp.id}
-                  className={`chip ${filters.learningPath === lp.name ? 'active' : ''}`}
+                  className={`chip ${filters.learningPath === lp.name ? 'active' : ''} ${!canUseLearningPathFilter ? 'disabled' : ''}`}
                   style={filters.learningPath === lp.name ? { background: lp.color } : {}}
-                  onClick={() => setFilter('learningPath', filters.learningPath === lp.name ? null : lp.name)}
+                  onClick={() => {
+                    if (canUseLearningPathFilter) {
+                      setFilter('learningPath', filters.learningPath === lp.name ? null : lp.name);
+                    }
+                  }}
+                  title={!canUseLearningPathFilter ? 'Upgrade to Professional to unlock' : undefined}
                 >
                   {lp.name}
                 </span>
@@ -47,6 +72,7 @@ export default function FilterBar() {
             </div>
           </div>
 
+          {/* Difficulty - available for Starter and above */}
           <div className="filter-section">
             <label>Difficulty</label>
             <div className="filter-chips">
@@ -63,6 +89,7 @@ export default function FilterBar() {
             </div>
           </div>
 
+          {/* Tactic - available for Starter and above */}
           <div className="filter-section">
             <label>Tactic</label>
             <div className="filter-chips">

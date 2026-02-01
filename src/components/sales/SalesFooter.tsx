@@ -1,8 +1,11 @@
 import { salesPageCopy } from '../../constants/salesPageCopy';
 import { SalesButton, SalesSection } from './shared';
+import { GoogleLoginButton } from '../auth/GoogleLoginButton';
+import { useAuthStore } from '@/store/authStore';
 
 export function SalesFooter() {
   const { footer } = salesPageCopy;
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <>
@@ -11,9 +14,15 @@ export function SalesFooter() {
         <div className="sales-final-cta-content">
           <h2 className="sales-final-cta-headline">{footer.ctaHeadline}</h2>
           <p className="sales-final-cta-subheadline">{footer.ctaSubheadline}</p>
-          <SalesButton variant="primary" size="lg" to="/learn">
-            {footer.ctaButton}
-          </SalesButton>
+          {isAuthenticated ? (
+            <SalesButton variant="primary" size="lg" to="/learn">
+              {footer.ctaButton}
+            </SalesButton>
+          ) : (
+            <div className="google-login-wrapper">
+              <GoogleLoginButton />
+            </div>
+          )}
         </div>
       </SalesSection>
 

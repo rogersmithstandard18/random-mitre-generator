@@ -93,10 +93,14 @@ export const useTopicStore = create<TopicState>()(
         set(state => ({
           filters: { ...state.filters, [key]: value },
         }));
+        // Auto-generate a new card matching the filter
+        get().generateRandomCard();
       },
 
       clearFilters: () => {
         set({ filters: { difficulty: null, learningPath: null, tactic: null } });
+        // Auto-generate a new card with no filters
+        get().generateRandomCard();
       },
 
       toggleFavorite: (techniqueId: string) => {
