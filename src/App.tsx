@@ -1,12 +1,16 @@
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Shield } from 'lucide-react';
 import CardPage from './pages/CardPage';
 import HistoryPage from './pages/HistoryPage';
 import { SalesPage } from './pages/SalesPage';
+import { UserMenu } from './components/auth/UserMenu';
+import { useAuthStore } from './store/authStore';
 
 function AppContent() {
   const location = useLocation();
   const isSalesPage = location.pathname === '/';
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
     <div className="app">
@@ -15,10 +19,15 @@ function AppContent() {
           <Shield size={20} />
           CyberSecurity Learner
         </NavLink>
-        <div className="navbar-links">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/learn">Learn</NavLink>
-          <NavLink to="/history">History</NavLink>
+        <div className="navbar-right">
+          {isAuthenticated && (
+            <div className="navbar-links">
+              <NavLink to="/" end>Home</NavLink>
+              <NavLink to="/learn">Learn</NavLink>
+              <NavLink to="/history">History</NavLink>
+            </div>
+          )}
+          <UserMenu />
         </div>
       </nav>
       {isSalesPage ? (
@@ -38,10 +47,14 @@ function AppContent() {
 }
 
 function App() {
+  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <GoogleOAuthProvider clientId={clientId}>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }
 
