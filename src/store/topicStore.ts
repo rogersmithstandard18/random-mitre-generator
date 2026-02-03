@@ -22,6 +22,7 @@ interface TopicState {
   clearFilters: () => void;
   toggleFavorite: (techniqueId: string) => void;
   toggleAdvanced: () => void;
+  restoreFromServer: (data: { cardHistory?: unknown[]; favorites?: string[]; showAdvanced?: boolean }) => void;
 }
 
 function getFilteredTechniques(filters: Filters): TranslationCard[] {
@@ -120,6 +121,14 @@ export const useTopicStore = create<TopicState>()(
           const newShowAdvanced = !state.showAdvanced;
           syncToBackend({ cardHistory: state.cardHistory, favorites: state.favorites, showAdvanced: newShowAdvanced });
           return { showAdvanced: newShowAdvanced };
+        });
+      },
+
+      restoreFromServer: (data) => {
+        set({
+          cardHistory: (data.cardHistory as TranslationCard[]) || [],
+          favorites: data.favorites || [],
+          showAdvanced: data.showAdvanced || false,
         });
       },
     }),

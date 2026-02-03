@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import jwt from 'jsonwebtoken';
+import { supabase } from '../lib/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
@@ -25,17 +26,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const { cardHistory, favorites, showAdvanced } = req.body as UserData;
 
-    // TODO: Save to your database
-    // await db.users.update({
-    //   where: { id: decoded.id },
-    //   data: { cardHistory, favorites, showAdvanced }
-    // });
+    // Save to Supabase
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        card_history: cardHistory || [],
+        favorites: favorites || [],
+        show_advanced: showAdvanced || false,
+      })
+      .eq('id', decoded.id);
 
-    console.log(`Syncing data for user ${decoded.id}:`, {
-      cardHistoryCount: cardHistory?.length,
-      favoritesCount: favorites?.length,
-      showAdvanced,
-    });
+    if (updateError) {
+      console.error('Sync error:', updateError);
+      return res.status(500).json({ error: 'Sync failed' });
+    }
 
     return res.status(200).json({ success: true });
   } catch (error) {
