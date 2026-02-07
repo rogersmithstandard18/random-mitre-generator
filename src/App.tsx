@@ -4,12 +4,15 @@ import { Shield } from 'lucide-react';
 import CardPage from './pages/CardPage';
 import HistoryPage from './pages/HistoryPage';
 import { SalesPage } from './pages/SalesPage';
+import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
+import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { UserMenu } from './components/auth/UserMenu';
 import { useAuthStore } from './store/authStore';
 
 function AppContent() {
   const location = useLocation();
   const isSalesPage = location.pathname === '/';
+  const isPaymentPage = location.pathname.startsWith('/payment');
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   return (
@@ -34,6 +37,13 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<SalesPage />} />
         </Routes>
+      ) : isPaymentPage ? (
+        <div className="page">
+          <Routes>
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/payment/cancel" element={<PaymentCancelPage />} />
+          </Routes>
+        </div>
       ) : (
         <div className="page">
           <Routes>

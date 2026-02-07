@@ -1355,6 +1355,97 @@ a {
    END AUTH COMPONENTS
    ========================================== */
 
+/* ==========================================
+   PAYMENT PAGES
+   ========================================== */
+
+.payment-result-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+
+.payment-result-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 48px;
+  text-align: center;
+  max-width: 480px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+}
+
+.payment-result-icon {
+  margin-bottom: 24px;
+}
+
+.payment-result-card.success .payment-result-icon {
+  color: #4CAF50;
+}
+
+.payment-result-card.cancel .payment-result-icon {
+  color: #FF5252;
+}
+
+.payment-result-card h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.payment-result-card p {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.payment-result-note {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.payment-result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Pricing Login Wrapper */
+.pricing-login-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-login-hint {
+  font-size: 13px;
+  color: #888;
+  margin: 0;
+}
+
+/* Spinner animation */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   END PAYMENT PAGES
+   ========================================== */
+
 /* Responsive */
 @media (max-width: 600px) {
   .page {
