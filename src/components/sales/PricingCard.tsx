@@ -1,10 +1,20 @@
-import { Check } from 'lucide-react';
+import { useState } from 'react';
+import { Check, Loader2 } from 'lucide-react';
 import { SalesButton, SalesBadge } from './shared';
+import { GoogleLoginButton } from '../auth/GoogleLoginButton';
+import { useAuthStore } from '@/store/authStore';
 import type { PricingTier } from '../../constants/salesPageCopy';
 
 export interface PricingCardProps {
   tier: PricingTier;
 }
+
+// Map tier names to API tier values
+const tierNameToApiTier: Record<string, string> = {
+  'Starter': 'starter',
+  'Professional': 'professional',
+  'Team': 'team',
+};
 
 export function PricingCard({ tier }: PricingCardProps) {
   const {
@@ -17,6 +27,44 @@ export function PricingCard({ tier }: PricingCardProps) {
     highlighted,
     badge,
   } = tier;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const token = useAuthStore((s) => s.token);
+
+  const handleCheckout = async () => {
+    const apiTier = tierNameToApiTier[name];
+    if (!apiTier || !token) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ tier: apiTier }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error('Checkout error:', data.error);
+        alert('Failed to start checkout. Please try again.');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to start checkout. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const isFree = price === 0;
+  const isPaid = price > 0;
 
   return (
     <div
@@ -42,14 +90,51 @@ export function PricingCard({ tier }: PricingCardProps) {
           </li>
         ))}
       </ul>
-      <SalesButton
-        variant={highlighted ? 'primary' : 'outline'}
-        size="lg"
-        fullWidth
-        to="/learn"
-      >
-        {cta}
-      </SalesButton>
+
+      {/* Free tier */}
+      {isFree && (
+        isAuthenticated ? (
+          <SalesButton
+            variant={highlighted ? 'primary' : 'outline'}
+            size="lg"
+            fullWidth
+            to="/learn"
+          >
+            {cta}
+          </SalesButton>
+        ) : (
+          <div className="pricing-login-wrapper">
+            <GoogleLoginButton />
+          </div>
+        )
+      )}
+
+      {/* Paid tiers */}
+      {isPaid && (
+        isAuthenticated ? (
+          <SalesButton
+            variant={highlighted ? 'primary' : 'outline'}
+            size="lg"
+            fullWidth
+            onClick={handleCheckout}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 size={18} className="spinner" />
+                Processing...
+              </>
+            ) : (
+              cta
+            )}
+          </SalesButton>
+        ) : (
+          <div className="pricing-login-wrapper">
+            <p className="pricing-login-hint">Sign in to subscribe</p>
+            <GoogleLoginButton />
+          </div>
+        )
+      )}
     </div>
   );
 }
