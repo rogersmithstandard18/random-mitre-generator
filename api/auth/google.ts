@@ -1,16 +1,16 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { OAuth2Client } from 'google-auth-library';
-import jwt from 'jsonwebtoken';
-import { supabase, DbUser } from '../lib/supabase';
+import * as jwt from 'jsonwebtoken';
+import { supabase } from '../lib/supabase';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Try to set JSON header immediately
+  // Always return JSON content type if possible
   try {
     res.setHeader('Content-Type', 'application/json');
   } catch (e) {
-    console.error('Failed to set header:', e);
+    console.error('Failed to set Content-Type header');
   }
 
   if (req.method !== 'POST') {
@@ -20,26 +20,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
     if (!googleClientId) {
-      console.error('GOOGLE_CLIENT_ID environment variable is not set');
+      console.error('GOOGLE_CLIENT_ID environment variable is missing');
       return res.status(500).json({ error: 'Server configuration error: Missing Google Client ID' });
     }
 
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-      console.error('Supabase environment variables are not set');
-      return res.status(500).json({ error: 'Server configuration error: Missing database credentials' });
-    }
-
-    if (!supabase) {
-      console.error('Supabase client failed to initialize');
-      return res.status(500).json({ error: 'Server configuration error: Database client error' });
-    }
-
-    const { token } = req.body;
+    const { token } = req.body || {};
     if (!token) {
       return res.status(400).json({ error: 'Token is required' });
     }
 
-    console.log('Verifying Google token...');
     const client = new OAuth2Client(googleClientId);
 
     let ticket;
@@ -55,22 +44,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const payload = ticket.getPayload();
     if (!payload) {
-      console.error('No payload in Google token');
+      console.error('Google token payload is missing');
       return res.status(401).json({ error: 'Invalid token payload' });
     }
 
     const userId = payload.sub;
     const email = payload.email;
-
-    if (!userId || !email) {
-      console.error('Missing userId or email in payload');
-      return res.status(401).json({ error: 'Token missing required user information' });
-    }
-
     const name = payload.name || '';
     const picture = payload.picture || '';
 
-    console.log(`User ${email} authenticated, checking database...`);
+    if (!userId || !email) {
+      console.error('Missing sub or email in Google payload');
+      return res.status(401).json({ error: 'Token missing required user information' });
+    }
+
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      return res.status(500).json({ error: 'Database connection error' });
+    }
 
     // Check if user exists in Supabase
     const { data: existingUser, error: fetchError } = await supabase
@@ -79,11 +70,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('id', userId)
       .single();
 
-    let user: DbUser;
+    let user;
 
     if (fetchError && fetchError.code === 'PGRST116') {
-      console.log('User not found, creating new user...');
-      // User doesn't exist, create new user with 'free' tier
+      // User doesn't exist, create new user
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert({
@@ -101,16 +91,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (insertError) {
         console.error('Error creating user:', insertError);
-        return res.status(500).json({ error: 'Failed to create user in database' });
+        return res.status(500).json({ error: 'Failed to create user' });
       }
 
       user = newUser;
     } else if (fetchError) {
       console.error('Error fetching user:', fetchError);
-      return res.status(500).json({ error: 'Database error while fetching user' });
+      return res.status(500).json({ error: 'Database error' });
     } else {
-      console.log('Existing user found, updating profile...');
-      // Update existing user's name and picture (they may have changed)
+      // Update existing user
       const { data: updatedUser, error: updateError } = await supabase
         .from('users')
         .update({ name, picture })
@@ -118,48 +107,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .select()
         .single();
 
-      if (updateError) {
-        console.error('Error updating user:', updateError);
-        user = existingUser;
-      } else {
-        user = updatedUser;
-      }
+      user = updateError ? existingUser : updatedUser;
     }
 
-    // Create JWT with user info including tier
-    const authToken = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        tier: user.tier,
-      },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    if (!user) {
+      return res.status(500).json({ error: 'User data missing after database operation' });
+    }
 
-    console.log('Auth successful, returning token');
-    return res.status(200).json({
-      token: authToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        tier: user.tier,
-      },
-      // Include saved data so client can restore state
-      savedData: {
-        cardHistory: user.card_history,
-        favorites: user.favorites,
-        showAdvanced: user.show_advanced,
-      },
-    });
+    // Create JWT
+    try {
+      // Use the sign method from the imported jwt module
+      // Note: jsonwebtoken often uses default export for sign, but * as jwt handles both
+      const signOptions: any = { expiresIn: '7d' };
+      const signFunc = (jwt as any).default?.sign || (jwt as any).sign;
+
+      const authToken = signFunc(
+        {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          tier: user.tier,
+        },
+        JWT_SECRET,
+        signOptions
+      );
+
+      return res.status(200).json({
+        token: authToken,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          picture: user.picture,
+          tier: user.tier,
+        },
+        savedData: {
+          cardHistory: user.card_history,
+          favorites: user.favorites,
+          showAdvanced: user.show_advanced,
+        },
+      });
+    } catch (jwtError: any) {
+      console.error('JWT signing failed:', jwtError.message);
+      return res.status(500).json({ error: 'Failed to generate authentication token' });
+    }
   } catch (error: any) {
-    console.error('UNCAUGHT Auth error:', error);
+    console.error('Unexpected auth error:', error);
     return res.status(500).json({
-      error: 'Authentication failed due to an internal server error',
+      error: 'An internal server error occurred',
       details: error.message
     });
   }
