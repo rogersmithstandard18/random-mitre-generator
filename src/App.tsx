@@ -59,8 +59,12 @@ function AppContent() {
 function App() {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
+  if (!clientId) {
+    console.error('VITE_GOOGLE_CLIENT_ID is not defined in environment variables');
+  }
+
   return (
-    <GoogleOAuthProvider clientId={clientId}>
+    <GoogleOAuthProvider clientId={clientId || ''}>
       <BrowserRouter>
         <AppContent />
       </BrowserRouter>
