@@ -1268,6 +1268,17 @@ a {
    AUTH COMPONENTS
    ========================================== */
 
+.navbar-login {
+  transform: scale(0.85);
+  transform-origin: right center;
+}
+
+@media (max-width: 600px) {
+  .navbar-login {
+    transform: scale(0.75);
+  }
+}
+
 /* User Menu */
 .user-menu {
   position: relative;
@@ -1538,6 +1549,6 @@ a {
   }
 
   .user-menu-trigger {
-    padding: 4px;
+    padding: 8px;
   }
 }

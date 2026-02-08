@@ -104,7 +104,7 @@ export function PricingCard({ tier }: PricingCardProps) {
           </SalesButton>
         ) : (
           <div className="pricing-login-wrapper">
-            <GoogleLoginButton />
+            <GoogleLoginButton redirectPath={null} />
           </div>
         )
       )}
@@ -131,7 +131,7 @@ export function PricingCard({ tier }: PricingCardProps) {
         ) : (
           <div className="pricing-login-wrapper">
             <p className="pricing-login-hint">Sign in to subscribe</p>
-            <GoogleLoginButton />
+            <GoogleLoginButton redirectPath={null} />
           </div>
         )
       )}

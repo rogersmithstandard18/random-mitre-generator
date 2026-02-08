@@ -30,7 +30,10 @@ export function useGoogleAuth() {
   const restoreFromServer = useTopicStore((s) => s.restoreFromServer);
   const navigate = useNavigate();
 
-  const handleGoogleSuccess = useCallback(async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = useCallback(async (
+    credentialResponse: CredentialResponse,
+    redirectPath: string | null = '/learn'
+  ) => {
     if (!credentialResponse.credential) return;
     if (isGlobalLoading) {
       console.warn('Google Auth already in progress');
@@ -38,6 +41,7 @@ export function useGoogleAuth() {
     }
 
     isGlobalLoading = true;
+    console.log('Starting Google authentication process...');
 
     try {
       const response = await fetch('/api/auth/google', {
@@ -88,7 +92,12 @@ export function useGoogleAuth() {
         await syncLocalDataToBackend(data.token);
       }
 
-      navigate('/learn');
+      if (redirectPath) {
+        console.log('Login successful, navigating to:', redirectPath);
+        navigate(redirectPath);
+      } else {
+        console.log('Login successful, staying on current page');
+      }
     } catch (error: any) {
       console.error('Login process failed:', error);
       throw error;

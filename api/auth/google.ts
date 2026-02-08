@@ -116,10 +116,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Create JWT
     try {
+      console.log('Attempting to sign JWT for user:', user.email);
+
       // Use the sign method from the imported jwt module
       // Note: jsonwebtoken often uses default export for sign, but * as jwt handles both
       const signOptions: any = { expiresIn: '7d' };
       const signFunc = (jwt as any).default?.sign || (jwt as any).sign;
+
+      if (typeof signFunc !== 'function') {
+        throw new Error('JWT sign is not a function. Check jsonwebtoken import.');
+      }
 
       const authToken = signFunc(
         {
@@ -132,6 +138,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         JWT_SECRET,
         signOptions
       );
+
+      console.log('JWT signed successfully');
 
       return res.status(200).json({
         token: authToken,
