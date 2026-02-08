@@ -1277,17 +1277,36 @@ a {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
+  padding: 4px 10px 4px 4px;
+  border-radius: 20px;
   transition: background 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   color: #fff;
 }
 
 .user-menu-trigger:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.user-menu-trigger-name {
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-menu-chevron {
+  transition: transform 0.2s;
+  opacity: 0.7;
+}
+
+.user-menu-chevron-open {
+  transform: rotate(180deg);
 }
 
 .user-avatar {
@@ -1471,5 +1490,13 @@ a {
   .navbar-links a {
     padding: 8px 10px;
     font-size: 13px;
+  }
+
+  .user-menu-trigger-name {
+    display: none;
+  }
+
+  .user-menu-trigger {
+    padding: 4px;
   }
 }
