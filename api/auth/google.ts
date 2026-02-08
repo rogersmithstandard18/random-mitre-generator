@@ -1,9 +1,12 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { OAuth2Client } from 'google-auth-library';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { supabase } from '../lib/supabase';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+// Helper to get env var with case-insensitive names
+const getEnv = (name: string) => {
+  return process.env[name] || process.env[name.toLowerCase()] || process.env[name.toUpperCase()] || '';
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Wrap everything in a top-level try-catch to avoid FUNCTION_INVOCATION_FAILED
@@ -15,13 +18,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('Failed to set Content-Type header');
     }
 
+    console.log(`Auth request received: ${req.method}`);
+
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
     // Environment variable validation
-    const googleClientId = process.env.GOOGLE_CLIENT_ID;
-    const jwtSecret = process.env.JWT_SECRET;
+    const googleClientId = getEnv('GOOGLE_CLIENT_ID');
+    const jwtSecret = getEnv('JWT_SECRET');
 
     if (!googleClientId || !jwtSecret) {
       const missing = [];
@@ -31,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('Missing required environment variables:', missing.join(', '));
       return res.status(500).json({
         error: 'Server configuration error',
-        details: `Missing: ${missing.join(', ')}`
+        details: `Missing: ${missing.join(', ')}. Check Vercel environment variables.`
       });
     }
 
@@ -133,13 +138,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
       console.log('Attempting to sign JWT for user:', user.email);
 
-      // Use the sign method from the imported jwt module
-      // Note: jsonwebtoken often uses default export for sign, but * as jwt handles both
-      const signOptions: any = { expiresIn: '7d' };
-      const signFunc = (jwt as any).default?.sign || (jwt as any).sign;
+      // Support both default and named export for sign
+      const signFunc = (jwt as any).sign || (jwt as any).default?.sign;
 
       if (typeof signFunc !== 'function') {
-        throw new Error('JWT sign is not a function. Check jsonwebtoken import.');
+        console.error('JWT sign is not a function. jwt object:', typeof jwt, Object.keys(jwt as any));
+        throw new Error('JWT sign is not a function. Check jsonwebtoken module loading.');
       }
 
       const authToken = signFunc(
@@ -150,8 +154,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           picture: user.picture,
           tier: user.tier,
         },
-        JWT_SECRET,
-        signOptions
+        jwtSecret,
+        { expiresIn: '7d' }
       );
 
       console.log('JWT signed successfully');

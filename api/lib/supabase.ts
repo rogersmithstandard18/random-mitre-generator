@@ -1,16 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Helper to get env var with case-insensitive names
+const getEnv = (name: string) => {
+  return process.env[name] || process.env[name.toLowerCase()] || process.env[name.toUpperCase()] || '';
+};
+
 // Support both SUPABASE_URL and legacy SUPABASE_API names
-const supabaseUrl = process.env.SUPABASE_URL || process.env.SUPABASE_API || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
+const supabaseUrl = getEnv('SUPABASE_URL') || getEnv('SUPABASE_API');
+const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('CRITICAL: Missing Supabase environment variables');
-  console.error('SUPABASE_URL:', supabaseUrl ? 'Present' : 'MISSING');
-  console.error('SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Present' : 'MISSING');
+  console.error('Available keys:', Object.keys(process.env).filter(k => k.toLowerCase().includes('supabase')));
 } else {
   if (!supabaseUrl.startsWith('https://')) {
     console.error('CRITICAL: SUPABASE_URL is invalid (must start with https://). Current value:', supabaseUrl);
+    console.error('Note: Supabase URL should look like https://xyz.supabase.co');
   }
 }
 
