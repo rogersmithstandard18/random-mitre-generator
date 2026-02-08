@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { useAuthStore, UserTier } from '@/store/authStore';
 import { useTopicStore } from '@/store/topicStore';
@@ -21,13 +22,23 @@ interface ApiResponse {
   };
 }
 
-export function GoogleLoginButton() {
+interface GoogleLoginButtonProps {
+  useOneTap?: boolean;
+}
+
+export function GoogleLoginButton({ useOneTap = false }: GoogleLoginButtonProps) {
   const login = useAuthStore((s) => s.login);
   const restoreFromServer = useTopicStore((s) => s.restoreFromServer);
   const navigate = useNavigate();
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSuccess = async (credentialResponse: CredentialResponse) => {
+  const handleSuccess = useCallback(async (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) return;
+    if (isLoading) return;
+
+    setIsLoading(true);
+    setLoginError(null);
 
     try {
       const response = await fetch('/api/auth/google', {
@@ -36,44 +47,64 @@ export function GoogleLoginButton() {
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
 
+      if (!response.ok) {
+        let errorMessage = 'Login failed. Please try again.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response was not JSON (e.g. plain text server error)
+        }
+        setLoginError(errorMessage);
+        setIsLoading(false);
+        return;
+      }
+
       const data: ApiResponse = await response.json();
 
-      if (response.ok) {
-        // Login with user data from server (includes tier from database)
-        login(data.token, {
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          picture: data.user.picture,
-          tier: data.user.tier,
-        });
+      // Login with user data from server (includes tier from database)
+      login(data.token, {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name,
+        picture: data.user.picture,
+        tier: data.user.tier,
+      });
 
-        // Restore saved data from server if available
-        if (data.savedData) {
-          restoreFromServer(data.savedData);
-        } else {
-          // First time user - sync local data to server
-          await syncLocalDataToBackend(data.token);
-        }
-
-        navigate('/learn');
+      // Restore saved data from server if available
+      if (data.savedData) {
+        restoreFromServer(data.savedData);
+      } else {
+        // First time user - sync local data to server
+        await syncLocalDataToBackend(data.token);
       }
+
+      navigate('/learn');
     } catch (error) {
       console.error('Login failed:', error);
+      setLoginError('Unable to connect to the server. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [isLoading, login, restoreFromServer, navigate]);
 
-  const handleError = () => {
-    console.error('Login Failed');
-  };
+  const handleError = useCallback(() => {
+    setLoginError('Google sign-in failed. Please try again.');
+  }, []);
 
   return (
-    <GoogleLogin
-      onSuccess={handleSuccess}
-      onError={handleError}
-      useOneTap
-      theme="filled_blue"
-    />
+    <div className="google-login-container">
+      <GoogleLogin
+        onSuccess={handleSuccess}
+        onError={handleError}
+        useOneTap={useOneTap}
+        theme="filled_blue"
+        cancel_on_tap_outside
+      />
+      {loginError && (
+        <p className="login-error-message">{loginError}</p>
+      )}
+    </div>
   );
 }
 

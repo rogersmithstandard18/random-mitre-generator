@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, ChevronDown } from 'lucide-react';
 
 export function UserMenu() {
   const { user, logout } = useAuthStore();
@@ -24,12 +24,16 @@ export function UserMenu() {
       <button
         className="user-menu-trigger"
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         {user.picture ? (
           <img src={user.picture} alt={user.name} className="user-avatar" />
         ) : (
           <User size={20} />
         )}
+        <span className="user-menu-trigger-name">{user.name?.split(' ')[0]}</span>
+        <ChevronDown size={14} className={`user-menu-chevron ${isOpen ? 'user-menu-chevron-open' : ''}`} />
       </button>
 
       {isOpen && (
