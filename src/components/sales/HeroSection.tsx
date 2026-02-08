@@ -37,7 +37,7 @@ export function HeroSection() {
             </SalesButton>
           ) : (
             <div className="google-login-wrapper">
-              <GoogleLoginButton useOneTap />
+              <GoogleLoginButton />
             </div>
           )}
           <SalesButton variant="outline" size="lg" onClick={scrollToPricing}>
