@@ -3,21 +3,39 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { supabase, DbUser } from '../lib/supabase';
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Always return JSON content type
+  res.setHeader('Content-Type', 'application/json');
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      console.error('GOOGLE_CLIENT_ID environment variable is not set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.error('Supabase environment variables are not set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    const client = new OAuth2Client(googleClientId);
     const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Token is required' });
+    }
 
     // Verify Google token
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: googleClientId,
     });
 
     const payload = ticket.getPayload();
