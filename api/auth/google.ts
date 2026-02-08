@@ -6,26 +6,38 @@ import { supabase } from '../lib/supabase';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Always return JSON content type if possible
+  // Wrap everything in a top-level try-catch to avoid FUNCTION_INVOCATION_FAILED
   try {
-    res.setHeader('Content-Type', 'application/json');
-  } catch (e) {
-    console.error('Failed to set Content-Type header');
-  }
+    // Always return JSON content type if possible
+    try {
+      res.setHeader('Content-Type', 'application/json');
+    } catch (e) {
+      console.error('Failed to set Content-Type header');
+    }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+    if (req.method !== 'POST') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
 
-  try {
+    // Environment variable validation
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
-    if (!googleClientId) {
-      console.error('GOOGLE_CLIENT_ID environment variable is missing');
-      return res.status(500).json({ error: 'Server configuration error: Missing Google Client ID' });
+    const jwtSecret = process.env.JWT_SECRET;
+
+    if (!googleClientId || !jwtSecret) {
+      const missing = [];
+      if (!googleClientId) missing.push('GOOGLE_CLIENT_ID');
+      if (!jwtSecret) missing.push('JWT_SECRET');
+
+      console.error('Missing required environment variables:', missing.join(', '));
+      return res.status(500).json({
+        error: 'Server configuration error',
+        details: `Missing: ${missing.join(', ')}`
+      });
     }
 
     const { token } = req.body || {};
     if (!token) {
+      console.error('Request body is missing token');
       return res.status(400).json({ error: 'Token is required' });
     }
 
@@ -59,8 +71,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!supabase) {
-      console.error('Supabase client not initialized');
-      return res.status(500).json({ error: 'Database connection error' });
+      console.error('Supabase client not initialized. Check server logs for initialization errors.');
+      return res.status(500).json({
+        error: 'Database connection error',
+        details: 'Supabase client failed to initialize. Check environment variables (URL/Keys).'
+      });
     }
 
     // Check if user exists in Supabase
@@ -160,11 +175,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('JWT signing failed:', jwtError.message);
       return res.status(500).json({ error: 'Failed to generate authentication token' });
     }
-  } catch (error: any) {
-    console.error('Unexpected auth error:', error);
-    return res.status(500).json({
-      error: 'An internal server error occurred',
-      details: error.message
-    });
+  } catch (globalError: any) {
+    console.error('GLOBAL AUTH ERROR:', globalError);
+    // Try to respond with JSON if we haven't already
+    if (!res.writableEnded) {
+      try {
+        return res.status(500).json({
+          error: 'A critical internal server error occurred',
+          details: globalError.message,
+          stack: process.env.NODE_ENV === 'development' ? globalError.stack : undefined
+        });
+      } catch (e) {
+        // Fallback for extreme cases
+        res.statusCode = 500;
+        res.end(JSON.stringify({ error: 'Fatal server error' }));
+      }
+    }
   }
 }

@@ -45,6 +45,7 @@ export function GoogleLoginButton({
         useOneTap={useOneTap}
         theme="filled_blue"
         cancel_on_tap_outside
+        use_fedcm_for_prompt={true}
       />
       {loginError && (
         <p className="login-error-message">{loginError}</p>

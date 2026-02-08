@@ -18,6 +18,7 @@ export function SalesPage() {
     onSuccess: (resp) => handleGoogleSuccess(resp, null),
     onError: () => console.error('One Tap login failed'),
     disabled: isAuthenticated,
+    use_fedcm_for_prompt: true,
   });
 
   return (
