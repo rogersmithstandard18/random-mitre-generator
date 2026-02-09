@@ -28,6 +28,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  if (!supabase) {
+    console.error('Supabase client not initialized');
+    return res.status(500).json({ error: 'Database connection error' });
+  }
+
   try {
     const rawBody = await getRawBody(req);
     const signature = req.headers['stripe-signature'] as string;
