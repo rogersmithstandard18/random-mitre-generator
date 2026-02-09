@@ -110,14 +110,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .single();
 
       if (insertError) {
-        console.error('Error creating user:', insertError);
-        return res.status(500).json({ error: 'Failed to create user' });
+        console.error('Error creating user:', JSON.stringify(insertError));
+        return res.status(500).json({
+          error: 'Failed to create user',
+          details: insertError.message,
+          code: insertError.code,
+          hint: insertError.hint || 'Check if the users table exists in Supabase and has the correct schema.'
+        });
       }
 
       user = newUser;
     } else if (fetchError) {
-      console.error('Error fetching user:', fetchError);
-      return res.status(500).json({ error: 'Database error' });
+      console.error('Error fetching user:', JSON.stringify(fetchError));
+      return res.status(500).json({
+        error: 'Database error',
+        details: fetchError.message,
+        code: fetchError.code,
+      });
     } else {
       // Update existing user
       const { data: updatedUser, error: updateError } = await supabase
