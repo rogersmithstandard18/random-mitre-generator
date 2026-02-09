@@ -6,8 +6,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20' as any,
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
-
 // Price IDs from Stripe (set these in Vercel env vars after running setup script)
 const PRICE_IDS: Record<string, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
@@ -21,6 +19,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET environment variable is not set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     // Get user from auth token
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
@@ -35,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('JWT verify is not a function');
     }
 
-    const decoded = verifyFunc(token, JWT_SECRET) as { id: string; email: string };
+    const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
 
     const { tier } = req.body;
 

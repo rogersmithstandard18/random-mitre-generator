@@ -1,8 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import * as jwt from 'jsonwebtoken';
-import { supabase } from '../lib/supabase';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+import { supabase } from '../lib/supabase.js';
 
 interface UserData {
   cardHistory: unknown[];
@@ -16,6 +14,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      console.error('JWT_SECRET environment variable is not set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      return res.status(500).json({ error: 'Database connection error' });
+    }
+
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized' });
@@ -29,7 +38,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       throw new Error('JWT verify is not a function');
     }
 
-    const decoded = verifyFunc(token, JWT_SECRET) as { id: string };
+    const decoded = verifyFunc(token, jwtSecret) as { id: string };
 
     const { cardHistory, favorites, showAdvanced } = req.body as UserData;
 
