@@ -4,9 +4,13 @@ import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 
 interface GoogleLoginButtonProps {
   useOneTap?: boolean;
+  redirectPath?: string | null;
 }
 
-export function GoogleLoginButton({ useOneTap = false }: GoogleLoginButtonProps) {
+export function GoogleLoginButton({
+  useOneTap = false,
+  redirectPath = '/learn'
+}: GoogleLoginButtonProps) {
   const { handleGoogleSuccess } = useGoogleAuth();
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +24,7 @@ export function GoogleLoginButton({ useOneTap = false }: GoogleLoginButtonProps)
     setLoginError(null);
 
     try {
-      await handleGoogleSuccess(credentialResponse);
+      await handleGoogleSuccess(credentialResponse, redirectPath);
     } catch (error: any) {
       setLoginError(error.message || 'Login failed. Please try again.');
     } finally {
@@ -41,6 +45,7 @@ export function GoogleLoginButton({ useOneTap = false }: GoogleLoginButtonProps)
         useOneTap={useOneTap}
         theme="filled_blue"
         cancel_on_tap_outside
+        use_fedcm_for_prompt={true}
       />
       {loginError && (
         <p className="login-error-message">{loginError}</p>

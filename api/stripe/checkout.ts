@@ -1,9 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-30.basil',
+  apiVersion: '2024-06-20' as any,
 });
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
@@ -28,7 +28,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const token = authHeader.substring(7);
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+
+    // Use the verify method safely
+    const verifyFunc = (jwt as any).default?.verify || (jwt as any).verify;
+    if (typeof verifyFunc !== 'function') {
+      throw new Error('JWT verify is not a function');
+    }
+
+    const decoded = verifyFunc(token, JWT_SECRET) as { id: string; email: string };
 
     const { tier } = req.body;
 

@@ -7,6 +7,7 @@ import { SalesPage } from './pages/SalesPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { UserMenu } from './components/auth/UserMenu';
+import { GoogleLoginButton } from './components/auth/GoogleLoginButton';
 import { useAuthStore } from './store/authStore';
 
 function AppContent() {
@@ -23,14 +24,20 @@ function AppContent() {
           CyberSecurity Learner
         </NavLink>
         <div className="navbar-right">
-          {isAuthenticated && (
-            <div className="navbar-links">
-              <NavLink to="/" end>Home</NavLink>
-              <NavLink to="/learn">Learn</NavLink>
-              <NavLink to="/history">History</NavLink>
+          {isAuthenticated ? (
+            <>
+              <div className="navbar-links">
+                <NavLink to="/" end>Home</NavLink>
+                <NavLink to="/learn">Learn</NavLink>
+                <NavLink to="/history">History</NavLink>
+              </div>
+              <UserMenu />
+            </>
+          ) : (
+            <div className="navbar-login">
+              <GoogleLoginButton useOneTap={false} />
             </div>
           )}
-          <UserMenu />
         </div>
       </nav>
       {isSalesPage ? (

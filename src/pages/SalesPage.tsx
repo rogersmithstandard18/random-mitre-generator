@@ -13,10 +13,12 @@ export function SalesPage() {
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
 
   // Enable One Tap on the Sales Page for unauthenticated users
+  // We don't redirect on the Sales Page so they can continue to Pricing if they want
   useGoogleOneTapLogin({
-    onSuccess: handleGoogleSuccess,
+    onSuccess: (resp) => handleGoogleSuccess(resp, null),
     onError: () => console.error('One Tap login failed'),
     disabled: isAuthenticated,
+    use_fedcm_for_prompt: true,
   });
 
   return (
