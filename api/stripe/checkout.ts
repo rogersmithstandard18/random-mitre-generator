@@ -2,11 +2,16 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import * as jwt from 'jsonwebtoken';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20' as any,
-});
+const getEnv = (name: string) => {
+  return process.env[name] || process.env[name.toLowerCase()] || process.env[name.toUpperCase()] || '';
+};
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
+const stripeSecretKey = getEnv('STRIPE_SECRET_KEY');
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
+  apiVersion: '2024-06-20' as any,
+}) : null;
+
+const JWT_SECRET = getEnv('JWT_SECRET') || getEnv('SUPABASE_JWT_SECRET') || 'your-secret-key-change-this';
 
 // Price IDs from Stripe (set these in Vercel env vars after running setup script)
 const PRICE_IDS: Record<string, string | undefined> = {
@@ -18,6 +23,11 @@ const PRICE_IDS: Record<string, string | undefined> = {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!stripe) {
+    console.error('Stripe client not initialized. Missing STRIPE_SECRET_KEY');
+    return res.status(500).json({ error: 'Stripe configuration error' });
   }
 
   try {

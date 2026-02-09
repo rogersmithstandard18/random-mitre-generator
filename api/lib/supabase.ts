@@ -11,7 +11,12 @@ const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('CRITICAL: Missing Supabase environment variables');
-  console.error('Available keys:', Object.keys(process.env).filter(k => k.toLowerCase().includes('supabase')));
+  const envKeys = Object.keys(process.env);
+  console.log('Available environment variable keys:', envKeys.filter(k =>
+    k.toLowerCase().includes('supabase') ||
+    k.toLowerCase().includes('jwt') ||
+    k.toLowerCase().includes('google')
+  ));
 } else {
   if (!supabaseUrl.startsWith('https://')) {
     console.error('CRITICAL: SUPABASE_URL is invalid (must start with https://). Current value:', supabaseUrl);
@@ -19,9 +24,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
   }
 }
 
-export const supabase = (supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://'))
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null as any;
+let supabaseClient = null;
+
+if (supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://')) {
+  try {
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  } catch (e: any) {
+    console.error('FAILED TO INITIALIZE SUPABASE CLIENT:', e.message);
+  }
+}
+
+export const supabase = supabaseClient as any;
 
 export interface DbUser {
   id: string;

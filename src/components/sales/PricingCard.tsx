@@ -7,6 +7,7 @@ import type { PricingTier } from '../../constants/salesPageCopy';
 
 export interface PricingCardProps {
   tier: PricingTier;
+  onLoginClick?: () => void;
 }
 
 // Map tier names to API tier values
@@ -16,7 +17,7 @@ const tierNameToApiTier: Record<string, string> = {
   'Team': 'team',
 };
 
-export function PricingCard({ tier }: PricingCardProps) {
+export function PricingCard({ tier, onLoginClick }: PricingCardProps) {
   const {
     name,
     price,
@@ -91,49 +92,34 @@ export function PricingCard({ tier }: PricingCardProps) {
         ))}
       </ul>
 
-      {/* Free tier */}
-      {isFree && (
-        isAuthenticated ? (
-          <SalesButton
-            variant={highlighted ? 'primary' : 'outline'}
-            size="lg"
-            fullWidth
-            to="/learn"
-          >
-            {cta}
-          </SalesButton>
-        ) : (
-          <div className="pricing-login-wrapper">
-            <GoogleLoginButton redirectPath={null} />
-          </div>
-        )
-      )}
-
-      {/* Paid tiers */}
-      {isPaid && (
-        isAuthenticated ? (
-          <SalesButton
-            variant={highlighted ? 'primary' : 'outline'}
-            size="lg"
-            fullWidth
-            onClick={handleCheckout}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 size={18} className="spinner" />
-                Processing...
-              </>
-            ) : (
-              cta
-            )}
-          </SalesButton>
-        ) : (
-          <div className="pricing-login-wrapper">
-            <p className="pricing-login-hint">Sign in to subscribe</p>
-            <GoogleLoginButton redirectPath={null} />
-          </div>
-        )
+      {/* Action Button */}
+      {isAuthenticated ? (
+        <SalesButton
+          variant={highlighted ? 'primary' : 'outline'}
+          size="lg"
+          fullWidth
+          onClick={isPaid ? handleCheckout : undefined}
+          to={isFree ? "/learn" : undefined}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 size={18} className="spinner" />
+              Processing...
+            </>
+          ) : (
+            cta
+          )}
+        </SalesButton>
+      ) : (
+        <SalesButton
+          variant={highlighted ? 'primary' : 'outline'}
+          size="lg"
+          fullWidth
+          onClick={onLoginClick}
+        >
+          {isFree ? 'Sign in to Start' : 'Sign in to Subscribe'}
+        </SalesButton>
       )}
     </div>
   );

@@ -4,7 +4,11 @@ import { SalesButton, SalesSection } from './shared';
 import { GoogleLoginButton } from '../auth/GoogleLoginButton';
 import { useAuthStore } from '@/store/authStore';
 
-export function HeroSection() {
+interface HeroSectionProps {
+  onLoginClick?: () => void;
+}
+
+export function HeroSection({ onLoginClick }: HeroSectionProps) {
   const { hero } = salesPageCopy;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -36,9 +40,9 @@ export function HeroSection() {
               {hero.primaryCTA}
             </SalesButton>
           ) : (
-            <div className="google-login-wrapper">
-              <GoogleLoginButton />
-            </div>
+            <SalesButton variant="primary" size="lg" onClick={onLoginClick}>
+              Sign in to Start
+            </SalesButton>
           )}
           <SalesButton variant="outline" size="lg" onClick={scrollToPricing}>
             {hero.secondaryCTA}

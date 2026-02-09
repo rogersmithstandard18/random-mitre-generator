@@ -2,11 +2,16 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import { supabase } from '../lib/supabase';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-06-20' as any,
-});
+const getEnv = (name: string) => {
+  return process.env[name] || process.env[name.toLowerCase()] || process.env[name.toUpperCase()] || '';
+};
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const stripeSecretKey = getEnv('STRIPE_SECRET_KEY');
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey, {
+  apiVersion: '2024-06-20' as any,
+}) : null;
+
+const webhookSecret = getEnv('STRIPE_WEBHOOK_SECRET');
 
 // Disable body parsing - we need the raw body for webhook signature verification
 export const config = {
@@ -26,6 +31,11 @@ async function getRawBody(req: VercelRequest): Promise<Buffer> {
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!stripe || !webhookSecret) {
+    console.error('Stripe webhook error: Missing configuration (stripe client or webhook secret)');
+    return res.status(500).json({ error: 'Stripe configuration error' });
   }
 
   try {

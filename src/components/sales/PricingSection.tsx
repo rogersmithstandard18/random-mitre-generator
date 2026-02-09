@@ -2,7 +2,11 @@ import { salesPageCopy } from '../../constants/salesPageCopy';
 import { SalesSection } from './shared';
 import { PricingCard } from './PricingCard';
 
-export function PricingSection() {
+interface PricingSectionProps {
+  onLoginClick?: () => void;
+}
+
+export function PricingSection({ onLoginClick }: PricingSectionProps) {
   const { pricing } = salesPageCopy;
 
   return (
@@ -13,7 +17,7 @@ export function PricingSection() {
       )}
       <div className="sales-pricing-grid">
         {pricing.tiers.map((tier, index) => (
-          <PricingCard key={index} tier={tier} />
+          <PricingCard key={index} tier={tier} onLoginClick={onLoginClick} />
         ))}
       </div>
     </SalesSection>

@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { OAuth2Client } from 'google-auth-library';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { supabase } from '../lib/supabase';
 
 // Helper to get env var with case-insensitive names
@@ -9,6 +9,7 @@ const getEnv = (name: string) => {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('--- Auth Handler Started ---');
   // Wrap everything in a top-level try-catch to avoid FUNCTION_INVOCATION_FAILED
   try {
     // Always return JSON content type if possible
@@ -25,27 +26,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Environment variable validation
-    const googleClientId = getEnv('GOOGLE_CLIENT_ID');
-    const jwtSecret = getEnv('JWT_SECRET');
+    // Support multiple aliases for flexibility
+    const googleClientId = getEnv('GOOGLE_CLIENT_ID') || getEnv('VITE_GOOGLE_CLIENT_ID');
+    const jwtSecret = getEnv('JWT_SECRET') || getEnv('SUPABASE_JWT_SECRET');
 
     if (!googleClientId || !jwtSecret) {
       const missing = [];
-      if (!googleClientId) missing.push('GOOGLE_CLIENT_ID');
-      if (!jwtSecret) missing.push('JWT_SECRET');
+      if (!googleClientId) missing.push('GOOGLE_CLIENT_ID/VITE_GOOGLE_CLIENT_ID');
+      if (!jwtSecret) missing.push('JWT_SECRET/SUPABASE_JWT_SECRET');
 
       console.error('Missing required environment variables:', missing.join(', '));
       return res.status(500).json({
         error: 'Server configuration error',
-        details: `Missing: ${missing.join(', ')}. Check Vercel environment variables.`
+        details: `Missing: ${missing.join(', ')}. Please ensure these are set in Vercel dashboard.`
       });
     }
 
     const { token } = req.body || {};
     if (!token) {
-      console.error('Request body is missing token');
+      console.error('Request body is missing token. Body:', JSON.stringify(req.body));
       return res.status(400).json({ error: 'Token is required' });
     }
 
+    console.log('Verifying Google token...');
     const client = new OAuth2Client(googleClientId);
 
     let ticket;
@@ -65,6 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Invalid token payload' });
     }
 
+    console.log('Google token verified for email:', payload.email);
     const userId = payload.sub;
     const email = payload.email;
     const name = payload.name || '';
