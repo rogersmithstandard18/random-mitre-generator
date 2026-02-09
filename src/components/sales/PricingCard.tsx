@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Check, Loader2 } from 'lucide-react';
 import { SalesButton, SalesBadge } from './shared';
-import { GoogleLoginButton } from '../auth/GoogleLoginButton';
 import { useAuthStore } from '@/store/authStore';
 import type { PricingTier } from '../../constants/salesPageCopy';
 
@@ -63,6 +62,10 @@ export function PricingCard({ tier }: PricingCardProps) {
     }
   };
 
+  const scrollToSignIn = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const isFree = price === 0;
   const isPaid = price > 0;
 
@@ -103,9 +106,14 @@ export function PricingCard({ tier }: PricingCardProps) {
             {cta}
           </SalesButton>
         ) : (
-          <div className="pricing-login-wrapper">
-            <GoogleLoginButton redirectPath={null} />
-          </div>
+          <SalesButton
+            variant={highlighted ? 'primary' : 'outline'}
+            size="lg"
+            fullWidth
+            onClick={scrollToSignIn}
+          >
+            Sign in to get started
+          </SalesButton>
         )
       )}
 
@@ -129,10 +137,14 @@ export function PricingCard({ tier }: PricingCardProps) {
             )}
           </SalesButton>
         ) : (
-          <div className="pricing-login-wrapper">
-            <p className="pricing-login-hint">Sign in to subscribe</p>
-            <GoogleLoginButton redirectPath={null} />
-          </div>
+          <SalesButton
+            variant={highlighted ? 'primary' : 'outline'}
+            size="lg"
+            fullWidth
+            onClick={scrollToSignIn}
+          >
+            Sign in to subscribe
+          </SalesButton>
         )
       )}
     </div>

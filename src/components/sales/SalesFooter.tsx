@@ -1,6 +1,5 @@
 import { salesPageCopy } from '../../constants/salesPageCopy';
 import { SalesButton, SalesSection } from './shared';
-import { GoogleLoginButton } from '../auth/GoogleLoginButton';
 import { useAuthStore } from '@/store/authStore';
 
 export function SalesFooter() {
@@ -19,9 +18,9 @@ export function SalesFooter() {
               {footer.ctaButton}
             </SalesButton>
           ) : (
-            <div className="google-login-wrapper">
-              <GoogleLoginButton />
-            </div>
+            <SalesButton variant="primary" size="lg" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              Get Started Free
+            </SalesButton>
           )}
         </div>
       </SalesSection>
