@@ -28,6 +28,7 @@ interface ScenarioState {
   getBestScore: (id: string) => number;
   getCompletedCount: () => number;
   getTotalScore: () => { earned: number; possible: number };
+  restoreFromServer: (data: unknown[]) => void;
 }
 
 async function syncProgressToBackend(progress: ScenarioProgress[]) {
@@ -150,6 +151,10 @@ export const useScenarioStore = create<ScenarioState>()(
           earned: prog.reduce((sum, p) => sum + p.score, 0),
           possible: prog.reduce((sum, p) => sum + p.maxScore, 0),
         };
+      },
+
+      restoreFromServer: (data) => {
+        set({ progress: (data as ScenarioProgress[]) || [] });
       },
     }),
     {

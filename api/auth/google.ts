@@ -105,6 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           card_history: [],
           favorites: [],
           show_advanced: false,
+          scenario_progress: [],
         })
         .select()
         .single();
@@ -173,6 +174,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           cardHistory: user.card_history,
           favorites: user.favorites,
           showAdvanced: user.show_advanced,
+          scenarioProgress: user.scenario_progress || [],
         },
       });
     } catch (jwtError: any) {

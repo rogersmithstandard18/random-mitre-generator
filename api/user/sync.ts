@@ -6,6 +6,7 @@ interface UserData {
   cardHistory: unknown[];
   favorites: string[];
   showAdvanced: boolean;
+  scenarioProgress?: unknown[];
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -40,16 +41,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const decoded = verifyFunc(token, jwtSecret) as { id: string };
 
-    const { cardHistory, favorites, showAdvanced } = req.body as UserData;
+    const { cardHistory, favorites, showAdvanced, scenarioProgress } = req.body as UserData;
+
+    // Build update object - only include fields that were sent
+    const updateData: Record<string, unknown> = {};
+    if (cardHistory !== undefined) updateData.card_history = cardHistory || [];
+    if (favorites !== undefined) updateData.favorites = favorites || [];
+    if (showAdvanced !== undefined) updateData.show_advanced = showAdvanced || false;
+    if (scenarioProgress !== undefined) updateData.scenario_progress = scenarioProgress || [];
 
     // Save to Supabase
     const { error: updateError } = await supabase
       .from('users')
-      .update({
-        card_history: cardHistory || [],
-        favorites: favorites || [],
-        show_advanced: showAdvanced || false,
-      })
+      .update(updateData)
       .eq('id', decoded.id);
 
     if (updateError) {

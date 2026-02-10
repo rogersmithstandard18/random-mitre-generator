@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { CredentialResponse } from '@react-oauth/google';
 import { useAuthStore } from '@/store/authStore';
 import { useTopicStore } from '@/store/topicStore';
+import { useScenarioStore } from '@/store/scenarioStore';
 import { useNavigate } from 'react-router-dom';
 
 interface ApiUser {
@@ -20,6 +21,7 @@ interface ApiResponse {
     cardHistory: unknown[];
     favorites: string[];
     showAdvanced: boolean;
+    scenarioProgress?: unknown[];
   };
 }
 
@@ -28,6 +30,7 @@ let isGlobalLoading = false;
 export function useGoogleAuth() {
   const login = useAuthStore((s) => s.login);
   const restoreFromServer = useTopicStore((s) => s.restoreFromServer);
+  const restoreScenarioProgress = useScenarioStore((s) => s.restoreFromServer);
   const navigate = useNavigate();
 
   const handleGoogleSuccess = useCallback(async (
@@ -88,6 +91,9 @@ export function useGoogleAuth() {
 
       if (data.savedData) {
         restoreFromServer(data.savedData);
+        if (data.savedData.scenarioProgress) {
+          restoreScenarioProgress(data.savedData.scenarioProgress);
+        }
       } else {
         await syncLocalDataToBackend(data.token);
       }
@@ -104,7 +110,7 @@ export function useGoogleAuth() {
     } finally {
       isGlobalLoading = false;
     }
-  }, [login, restoreFromServer, navigate]);
+  }, [login, restoreFromServer, restoreScenarioProgress, navigate]);
 
   return { handleGoogleSuccess };
 }
