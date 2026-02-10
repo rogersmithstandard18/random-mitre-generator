@@ -9,6 +9,9 @@ interface TierFeatures {
   canUseFavorites: boolean;
   canViewHistory: boolean;
   hasPrioritySupport: boolean;
+  canPlayScenarios: boolean;
+  canUseScenarioFilters: boolean;
+  canTrackScenarioProgress: boolean;
 }
 
 export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
@@ -18,6 +21,9 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canUseFavorites: false,
     canViewHistory: false,
     hasPrioritySupport: false,
+    canPlayScenarios: false,
+    canUseScenarioFilters: false,
+    canTrackScenarioProgress: false,
   },
   starter: {
     canUseFilters: true,
@@ -25,6 +31,9 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canUseFavorites: true,
     canViewHistory: true,
     hasPrioritySupport: false,
+    canPlayScenarios: true,
+    canUseScenarioFilters: false,
+    canTrackScenarioProgress: false,
   },
   professional: {
     canUseFilters: true,
@@ -32,6 +41,9 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canUseFavorites: true,
     canViewHistory: true,
     hasPrioritySupport: true,
+    canPlayScenarios: true,
+    canUseScenarioFilters: true,
+    canTrackScenarioProgress: true,
   },
   team: {
     canUseFilters: true,
@@ -39,6 +51,9 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canUseFavorites: true,
     canViewHistory: true,
     hasPrioritySupport: true,
+    canPlayScenarios: true,
+    canUseScenarioFilters: true,
+    canTrackScenarioProgress: true,
   },
 };
 

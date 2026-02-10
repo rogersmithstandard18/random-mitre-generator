@@ -5,6 +5,7 @@ import {
   Filter,
   Shield,
   Route,
+  Crosshair,
   LucideIcon,
 } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const iconMap: Record<string, LucideIcon> = {
   Filter,
   Shield,
   Route,
+  Crosshair,
 };
 
 export interface FeatureCardProps {

@@ -32,6 +32,7 @@ export interface DbUser {
   card_history: any[];
   favorites: string[];
   show_advanced: boolean;
+  scenario_progress: any[];
   created_at?: string;
   updated_at?: string;
 }
