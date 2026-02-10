@@ -34,7 +34,7 @@ export function ScenarioFilterBar() {
   const clearFilters = useScenarioStore(s => s.clearFilters);
   const canUseFilters = useAuthStore(s => s.getTierFeatures().canUseScenarioFilters);
 
-  const hasFilters = filters.difficulty || filters.learningPath || filters.mitreTactic || filters.securityPlus || filters.owasp;
+  const hasFilters = filters.difficulty || filters.learningPath || filters.securityPlus || filters.owasp;
 
   if (!canUseFilters) {
     return (

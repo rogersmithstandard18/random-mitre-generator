@@ -14,9 +14,10 @@ export function ScenarioCard({ scenario, canPlay, bestScore, isCompleted, onPlay
   const diffConfig = difficultyConfigs.find(d => d.level === scenario.difficulty);
 
   return (
-    <div
+    <button
       className={`scenario-card ${!canPlay ? 'scenario-card-locked' : ''}`}
-      onClick={() => canPlay && onPlay(scenario.id)}
+      onClick={() => onPlay(scenario.id)}
+      disabled={!canPlay}
       style={{ borderLeftColor: diffConfig?.color || '#999' }}
     >
       <div className="scenario-card-header">
@@ -32,7 +33,7 @@ export function ScenarioCard({ scenario, canPlay, bestScore, isCompleted, onPlay
         </span>
         {isCompleted && (
           <span className="scenario-card-score">
-            {bestScore}/8
+            {bestScore}/{scenario.choices[0]?.max_score || 8}
           </span>
         )}
       </div>
@@ -68,6 +69,6 @@ export function ScenarioCard({ scenario, canPlay, bestScore, isCompleted, onPlay
           <span>Upgrade to Starter to play</span>
         </div>
       )}
-    </div>
+    </button>
   );
 }

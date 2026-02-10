@@ -8,7 +8,6 @@ import { useAuthStore } from './authStore';
 interface ScenarioFilters {
   difficulty: Difficulty | null;
   learningPath: LearningPath | null;
-  mitreTactic: string | null;
   securityPlus: string | null;
   owasp: string | null;
 }
@@ -57,7 +56,6 @@ export const useScenarioStore = create<ScenarioState>()(
       filters: {
         difficulty: null,
         learningPath: null,
-        mitreTactic: null,
         securityPlus: null,
         owasp: null,
       },
@@ -96,7 +94,6 @@ export const useScenarioStore = create<ScenarioState>()(
           filters: {
             difficulty: null,
             learningPath: null,
-            mitreTactic: null,
             securityPlus: null,
             owasp: null,
           },
@@ -113,11 +110,6 @@ export const useScenarioStore = create<ScenarioState>()(
         if (filters.learningPath) {
           pool = pool.filter((s) =>
             s.learning_paths.includes(filters.learningPath!)
-          );
-        }
-        if (filters.mitreTactic) {
-          pool = pool.filter((s) =>
-            s.mitre_attack.tactics.some((t) => t.includes(filters.mitreTactic!))
           );
         }
         if (filters.securityPlus) {

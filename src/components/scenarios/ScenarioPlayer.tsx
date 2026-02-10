@@ -115,8 +115,8 @@ export function ScenarioPlayer({ scenario, onBack }: ScenarioPlayerProps) {
       <div className="scenario-concepts">
         <h3>Key Concepts</h3>
         <div className="scenario-concepts-list">
-          {scenario.key_concepts.map((concept, i) => (
-            <span key={i} className="scenario-concept-chip">{concept}</span>
+          {scenario.key_concepts.map((concept) => (
+            <span key={concept} className="scenario-concept-chip">{concept}</span>
           ))}
         </div>
       </div>
@@ -191,8 +191,8 @@ export function ScenarioPlayer({ scenario, onBack }: ScenarioPlayerProps) {
           <div className="scenario-outcome-section">
             <h3>Key Lessons</h3>
             <ul>
-              {currentChoice.lessons.map((lesson, i) => (
-                <li key={i}>{lesson}</li>
+              {currentChoice.lessons.map((lesson) => (
+                <li key={lesson}>{lesson}</li>
               ))}
             </ul>
           </div>
