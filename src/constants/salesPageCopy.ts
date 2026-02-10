@@ -59,6 +59,12 @@ export const salesPageCopy = {
           "Structured paths for Blue Team, Red Team, Purple Team, and GRC professionals.",
         icon: "Route",
       },
+      {
+        title: "SOC Scenarios",
+        description:
+          "Interactive choose-your-own-path incident response scenarios with real-world SOC decision-making.",
+        icon: "Crosshair",
+      },
     ],
   },
 
@@ -124,6 +130,7 @@ export const salesPageCopy = {
           "Basic filtering (difficulty & tactic)",
           "Favorites & history tracking",
           "Detection hints & mitigations",
+          "Interactive SOC scenarios",
         ],
         cta: "Start Learning",
         highlighted: false,
@@ -137,6 +144,8 @@ export const salesPageCopy = {
           "Everything in Starter",
           "Advanced filtering by learning path",
           "Blue Team / Red Team / Purple Team paths",
+          "Scenario filters (Security+, OWASP)",
+          "Scenario progress tracking",
           "Priority support",
         ],
         cta: "Go Professional",

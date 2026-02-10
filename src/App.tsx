@@ -3,6 +3,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Shield } from 'lucide-react';
 import CardPage from './pages/CardPage';
 import HistoryPage from './pages/HistoryPage';
+import ScenariosPage from './pages/ScenariosPage';
 import { SalesPage } from './pages/SalesPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
@@ -29,6 +30,7 @@ function AppContent() {
               <div className="navbar-links">
                 <NavLink to="/" end>Home</NavLink>
                 <NavLink to="/learn">Learn</NavLink>
+                <NavLink to="/scenarios">Scenarios</NavLink>
                 <NavLink to="/history">History</NavLink>
               </div>
               <UserMenu />
@@ -55,6 +57,7 @@ function AppContent() {
         <div className="page">
           <Routes>
             <Route path="/learn" element={<CardPage />} />
+            <Route path="/scenarios" element={<ScenariosPage />} />
             <Route path="/history" element={<HistoryPage />} />
           </Routes>
         </div>
