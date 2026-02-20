@@ -19,10 +19,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Validate configuration
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error('JWT_SECRET environment variable is not set');
       return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    // Check if any price IDs are missing
+    const missingPrices = Object.entries(PRICE_IDS)
+      .filter(([_, price]) => !price)
+      .map(([tier, _]) => `STRIPE_PRICE_${tier.toUpperCase()}`);
+
+    if (missingPrices.length > 0) {
+      console.error('Missing price IDs in environment:', missingPrices);
+      return res.status(500).json({
+        error: 'Server configuration error',
+        missing: missingPrices
+      });
     }
 
     // Get user from auth token
@@ -77,7 +91,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Checkout error:', error);
-    return res.status(500).json({ error: 'Failed to create checkout session' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Checkout error:', errorMessage);
+    console.error('Full error:', error);
+
+    // Check if it's a Stripe error
+    if (error instanceof Error && 'type' in error) {
+      console.error('Stripe error type:', (error as any).type);
+    }
+
+    return res.status(500).json({
+      error: 'Failed to create checkout session',
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    });
   }
 }
