@@ -7,10 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 // Price IDs from Stripe (set these in Vercel env vars after running setup script)
+// Note: 'team' tier uses email contact instead of Stripe checkout
 const PRICE_IDS: Record<string, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
   professional: process.env.STRIPE_PRICE_PROFESSIONAL,
-  team: process.env.STRIPE_PRICE_TEAM,
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -56,11 +56,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
 
     const { tier } = req.body;
+    const validTiers = ['starter', 'professional', 'team'];
 
-    if (!tier || !PRICE_IDS[tier]) {
+    if (!tier || !validTiers.includes(tier)) {
       return res.status(400).json({ error: 'Invalid tier' });
     }
 
+    // Team tier requires email contact - no Stripe checkout
+    if (tier === 'team') {
+      return res.status(200).json({
+        type: 'email',
+        message: 'Please contact us for a custom quote',
+        email: 'socialfunnels@gmail.com',
+        userEmail: decoded.email,
+      });
+    }
+
+    // Validate price ID exists for Stripe tiers
     const priceId = PRICE_IDS[tier];
     if (!priceId) {
       return res.status(500).json({ error: 'Price not configured for this tier' });
