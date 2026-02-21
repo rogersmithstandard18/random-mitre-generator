@@ -154,8 +154,8 @@ export const salesPageCopy = {
       },
       {
         name: "Team",
-        price: 79,
-        period: "month" as const,
+        price: null as any,
+        period: "custom" as const,
         description: "For teams and organizations",
         features: [
           "Everything in Professional",
@@ -164,8 +164,9 @@ export const salesPageCopy = {
           "API access",
           "Dedicated support",
         ],
-        cta: "Contact Sales",
+        cta: "Request Quote",
         highlighted: false,
+        contactEmail: "socialfunnels@gmail.com",
       },
     ],
   },
