@@ -101,9 +101,9 @@ export const useAuthStore = create<AuthState>()(
       getUserTier: () => {
         const user = get().user;
 
-        // Admin bypass: if user's email matches ADMIN_EMAIL env var, grant professional tier
-        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL;
-        if (adminEmail && user?.email === adminEmail) {
+        // Special user bypass
+        const specialEmail = import.meta.env.VITE_SPECIAL_USER;
+        if (specialEmail && user?.email === specialEmail) {
           return 'professional';
         }
 
