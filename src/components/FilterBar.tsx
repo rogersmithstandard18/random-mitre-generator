@@ -18,10 +18,13 @@ export default function FilterBar() {
   const setFilter = useTopicStore(s => s.setFilter);
   const clearFilters = useTopicStore(s => s.clearFilters);
   const getTierFeatures = useAuthStore(s => s.getTierFeatures);
+  const getUserTier = useAuthStore(s => s.getUserTier);
+  const user = useAuthStore(s => s.user);
 
   const features = getTierFeatures();
   const canUseFilters = features.canUseFilters;
   const canUseLearningPathFilter = features.canUseLearningPathFilter;
+  const tier = getUserTier();
 
   const hasFilters = filters.difficulty || filters.learningPath || filters.tactic;
 
@@ -31,6 +34,10 @@ export default function FilterBar() {
       <div className="filter-locked">
         <Lock size={14} />
         <span>Upgrade to unlock filters</span>
+        {/* Debug info */}
+        <div style={{ fontSize: '10px', marginTop: '8px', opacity: 0.7 }}>
+          Tier: {tier} | Email: {user?.email || 'not logged in'}
+        </div>
       </div>
     );
   }
