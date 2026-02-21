@@ -102,7 +102,7 @@ export const useAuthStore = create<AuthState>()(
         const user = get().user;
 
         // Special user bypass
-        const specialEmail = import.meta.env.VITE_SPECIAL_USER;
+        const specialEmail = import.meta.env.VITE_AUDIO;
         if (specialEmail && user?.email === specialEmail) {
           return 'professional';
         }
