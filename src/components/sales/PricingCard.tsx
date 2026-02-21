@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore';
 import type { PricingTier } from '../../constants/salesPageCopy';
 
 export interface PricingCardProps {
-  tier: PricingTier;
+  tier: PricingTier & { contactEmail?: string };
 }
 
 // Map tier names to API tier values
@@ -26,6 +26,7 @@ export function PricingCard({ tier }: PricingCardProps) {
     cta,
     highlighted,
     badge,
+    contactEmail,
   } = tier;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -63,8 +64,9 @@ export function PricingCard({ tier }: PricingCardProps) {
     }
   };
 
-  const isFree = price === 0;
-  const isPaid = price > 0;
+  const isCustom = price === null || price === undefined;
+  const isFree = !isCustom && price === 0;
+  const isPaid = !isCustom && price > 0;
 
   return (
     <div
@@ -77,11 +79,17 @@ export function PricingCard({ tier }: PricingCardProps) {
       )}
       <h3 className="sales-pricing-name">{name}</h3>
       <p className="sales-pricing-description">{description}</p>
-      <div className="sales-pricing-price">
-        <span className="sales-pricing-currency">$</span>
-        <span className="sales-pricing-amount">{price}</span>
-        <span className="sales-pricing-period">/{period}</span>
-      </div>
+      {!isCustom ? (
+        <div className="sales-pricing-price">
+          <span className="sales-pricing-currency">$</span>
+          <span className="sales-pricing-amount">{price as number}</span>
+          <span className="sales-pricing-period">/{period}</span>
+        </div>
+      ) : (
+        <div className="sales-pricing-price">
+          <span className="sales-pricing-amount">Custom Pricing</span>
+        </div>
+      )}
       <ul className="sales-pricing-features">
         {features.map((feature, index) => (
           <li key={index}>
@@ -134,6 +142,16 @@ export function PricingCard({ tier }: PricingCardProps) {
             <GoogleLoginButton redirectPath={null} />
           </div>
         )
+      )}
+
+      {/* Custom pricing tier (Team) */}
+      {isCustom && contactEmail && (
+        <a
+          href={`mailto:${contactEmail}?subject=Team Plan Inquiry`}
+          className={`sales-btn sales-btn-${highlighted ? 'primary' : 'outline'} sales-btn-lg sales-btn-full`}
+        >
+          {cta}
+        </a>
       )}
     </div>
   );

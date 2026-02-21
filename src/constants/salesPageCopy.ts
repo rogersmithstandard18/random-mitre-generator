@@ -5,6 +5,8 @@
  * Edit this file to update any text on the sales page.
  */
 
+import { SUPPORT_EMAIL } from '../../shared-constants';
+
 export const salesPageCopy = {
   hero: {
     headline: "Master Cybersecurity Through Translation",
@@ -154,7 +156,7 @@ export const salesPageCopy = {
       },
       {
         name: "Team",
-        price: 79,
+        price: null,
         period: "month" as const,
         description: "For teams and organizations",
         features: [
@@ -164,8 +166,9 @@ export const salesPageCopy = {
           "API access",
           "Dedicated support",
         ],
-        cta: "Contact Sales",
+        cta: "Request Quote",
         highlighted: false,
+        contactEmail: SUPPORT_EMAIL,
       },
     ],
   },

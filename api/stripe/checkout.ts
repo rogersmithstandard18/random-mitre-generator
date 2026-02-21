@@ -1,16 +1,17 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import * as jwt from 'jsonwebtoken';
+import { SUPPORT_EMAIL } from '../../shared-constants';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20' as any,
 });
 
 // Price IDs from Stripe (set these in Vercel env vars after running setup script)
+// Note: 'team' tier uses email contact instead of Stripe checkout
 const PRICE_IDS: Record<string, string | undefined> = {
   starter: process.env.STRIPE_PRICE_STARTER,
   professional: process.env.STRIPE_PRICE_PROFESSIONAL,
-  team: process.env.STRIPE_PRICE_TEAM,
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -19,10 +20,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Validate configuration
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
       console.error('JWT_SECRET environment variable is not set');
       return res.status(500).json({ error: 'Server configuration error' });
+    }
+
+    // Check if any price IDs are missing
+    const missingPrices = Object.entries(PRICE_IDS)
+      .filter(([_, price]) => !price)
+      .map(([tier, _]) => `STRIPE_PRICE_${tier.toUpperCase()}`);
+
+    if (missingPrices.length > 0) {
+      console.error('Missing price IDs in environment:', missingPrices);
+      return res.status(500).json({
+        error: 'Server configuration error',
+        missing: missingPrices
+      });
     }
 
     // Get user from auth token
@@ -42,11 +57,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
 
     const { tier } = req.body;
+    const validTiers = ['starter', 'professional', 'team'];
 
-    if (!tier || !PRICE_IDS[tier]) {
+    if (!tier || !validTiers.includes(tier)) {
       return res.status(400).json({ error: 'Invalid tier' });
     }
 
+    // Team tier requires email contact - no Stripe checkout
+    if (tier === 'team') {
+      return res.status(200).json({
+        type: 'email',
+        message: 'Please contact us for a custom quote',
+        email: SUPPORT_EMAIL,
+        userEmail: decoded.email,
+      });
+    }
+
+    // Validate price ID exists for Stripe tiers
     const priceId = PRICE_IDS[tier];
     if (!priceId) {
       return res.status(500).json({ error: 'Price not configured for this tier' });
@@ -77,7 +104,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Checkout error:', error);
-    return res.status(500).json({ error: 'Failed to create checkout session' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Checkout error:', errorMessage);
+    console.error('Full error:', error);
+
+    // Check if it's a Stripe error
+    if (error instanceof Error && 'type' in error) {
+      console.error('Stripe error type:', (error as any).type);
+    }
+
+    return res.status(500).json({
+      error: 'Failed to create checkout session',
+      details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+    });
   }
 }
