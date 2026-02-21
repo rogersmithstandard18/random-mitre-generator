@@ -103,7 +103,17 @@ export const useAuthStore = create<AuthState>()(
 
         // Special user bypass - check env var or hardcoded email
         const specialEmail = import.meta.env.VITE_AUDIO || 'socialfunnels@gmail.com';
+
+        // Debug log
+        console.log('getUserTier debug:', {
+          userEmail: user?.email,
+          specialEmail,
+          userTier: user?.tier,
+          match: user?.email === specialEmail,
+        });
+
         if (specialEmail && user?.email === specialEmail) {
+          console.log('Bypass matched! Returning professional');
           return 'professional';
         }
 
