@@ -146,15 +146,11 @@ export function PricingCard({ tier }: PricingCardProps) {
 
       {/* Custom pricing tier (Team) */}
       {isCustom && contactEmail && (
-        <a href={`mailto:${contactEmail}?subject=Team Plan Inquiry`}>
-          <SalesButton
-            variant={highlighted ? 'primary' : 'outline'}
-            size="lg"
-            fullWidth
-            as="div"
-          >
-            {cta}
-          </SalesButton>
+        <a
+          href={`mailto:${contactEmail}?subject=Team Plan Inquiry`}
+          className={`sales-btn sales-btn-${highlighted ? 'primary' : 'outline'} sales-btn-lg sales-btn-full`}
+        >
+          {cta}
         </a>
       )}
     </div>
