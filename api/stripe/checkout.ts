@@ -1,6 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import * as jwt from 'jsonwebtoken';
+import { SUPPORT_EMAIL } from '../../shared-constants';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20' as any,
@@ -67,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({
         type: 'email',
         message: 'Please contact us for a custom quote',
-        email: 'socialfunnels@gmail.com',
+        email: SUPPORT_EMAIL,
         userEmail: decoded.email,
       });
     }

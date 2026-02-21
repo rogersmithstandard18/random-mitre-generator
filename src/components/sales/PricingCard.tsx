@@ -64,9 +64,9 @@ export function PricingCard({ tier }: PricingCardProps) {
     }
   };
 
-  const isFree = price === 0;
-  const isPaid = price > 0;
   const isCustom = price === null || price === undefined;
+  const isFree = !isCustom && price === 0;
+  const isPaid = !isCustom && price > 0;
 
   return (
     <div
@@ -79,10 +79,10 @@ export function PricingCard({ tier }: PricingCardProps) {
       )}
       <h3 className="sales-pricing-name">{name}</h3>
       <p className="sales-pricing-description">{description}</p>
-      {price !== null && price !== undefined ? (
+      {!isCustom ? (
         <div className="sales-pricing-price">
           <span className="sales-pricing-currency">$</span>
-          <span className="sales-pricing-amount">{price}</span>
+          <span className="sales-pricing-amount">{price as number}</span>
           <span className="sales-pricing-period">/{period}</span>
         </div>
       ) : (
