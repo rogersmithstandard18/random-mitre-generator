@@ -55,8 +55,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
 
-    // Admin bypass: skip checkout for admin email
-    const adminEmail = process.env.VITE_AUDIO;
+    // Admin bypass: skip checkout for admin email (check env var or hardcoded email)
+    const adminEmail = process.env.VITE_AUDIO || 'socialfunnels@gmail.com';
     if (adminEmail && decoded.email === adminEmail) {
       return res.status(200).json({
         type: 'admin',

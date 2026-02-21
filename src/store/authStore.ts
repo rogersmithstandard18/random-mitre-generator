@@ -101,8 +101,8 @@ export const useAuthStore = create<AuthState>()(
       getUserTier: () => {
         const user = get().user;
 
-        // Special user bypass
-        const specialEmail = import.meta.env.VITE_AUDIO;
+        // Special user bypass - check env var or hardcoded email
+        const specialEmail = import.meta.env.VITE_AUDIO || 'socialfunnels@gmail.com';
         if (specialEmail && user?.email === specialEmail) {
           return 'professional';
         }
