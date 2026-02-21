@@ -50,8 +50,21 @@ export function PricingCard({ tier }: PricingCardProps) {
 
       const data = await response.json();
 
-      if (response.ok && data.url) {
-        window.location.href = data.url;
+      if (response.ok) {
+        // Admin bypass - redirect to learn page
+        if (data.type === 'admin' && data.bypass) {
+          window.location.href = '/learn';
+          return;
+        }
+
+        // Stripe checkout
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+
+        console.error('Checkout error: unexpected response', data);
+        alert('Failed to start checkout. Please try again.');
       } else {
         console.error('Checkout error:', data.error);
         alert('Failed to start checkout. Please try again.');

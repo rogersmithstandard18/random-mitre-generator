@@ -55,6 +55,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
 
+    // Admin bypass: skip checkout for admin email
+    const adminEmail = process.env.VITE_AUDIO;
+    if (adminEmail && decoded.email === adminEmail) {
+      return res.status(200).json({
+        type: 'admin',
+        message: 'Admin user - access granted',
+        bypass: true,
+      });
+    }
+
     const { tier } = req.body;
     const validTiers = ['starter', 'professional', 'team'];
 
