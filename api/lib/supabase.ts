@@ -8,6 +8,7 @@ const getEnv = (name: string) => {
 // Support both SUPABASE_URL and legacy SUPABASE_API names
 const supabaseUrl = getEnv('SUPABASE_URL') || getEnv('SUPABASE_API');
 const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
+const supabaseServiceKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error('CRITICAL: Missing Supabase environment variables');
@@ -22,6 +23,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = (supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://'))
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null as any;
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 export interface DbUser {
   id: string;
