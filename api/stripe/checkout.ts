@@ -1,7 +1,9 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
 import * as jwt from 'jsonwebtoken';
-import { SUPPORT_EMAIL } from '../../shared-constants';
+
+
+const SUPPORT_EMAIL = 'socialfunnels@gmail.com';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20' as any,
