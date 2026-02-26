@@ -84,17 +84,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Check if user exists in Supabase
-    const { data: existingUser, error: fetchError } = await supabase
+    const { data: updateUser, error: updateError } = await supabaseAdmin
       .from('users')
-      .select('*')
+      .update({ name, picture })
       .eq('id', userId)
+      .select()
       .single();
 
     let user;
 
     if (fetchError && fetchError.code === 'PGRST116') {
       // User doesn't exist, create new user
-      const { data: newUser, error: insertError } = await supabase
+      const { data: newUser, error: insertError } = await supabaseAdmin
         .from('users')
         .insert({
           id: userId,
