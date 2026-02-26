@@ -83,12 +83,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Check if user exists in Supabase
-    const { data: newUser, error: insertError } = await supabaseAdmin
+    // Check if user exists in Supabase (SELECT FIRST)
+    const { data: existingUser, error: fetchError } = await supabaseAdmin
       .from('users')
-      .update({ name, picture })
+      .select('*')
       .eq('id', userId)
-      .select()
       .single();
 
     let user;
@@ -122,7 +121,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'Database error' });
     } else {
       // Update existing user
-      const { data: updatedUser, error: updateError } = await supabase
+      const { data: updatedUser, error: updateError } = await supabaseAdmin
         .from('users')
         .update({ name, picture })
         .eq('id', userId)
