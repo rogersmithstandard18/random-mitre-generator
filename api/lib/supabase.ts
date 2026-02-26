@@ -23,7 +23,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = (supabaseUrl && supabaseAnonKey && supabaseUrl.startsWith('https://'))
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null as any;
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+export const supabaseAdmin = (supabaseUrl && supabaseServiceKey && supabaseUrl.startsWith('https://'))
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null as any;
 
 export interface DbUser {
   id: string;
