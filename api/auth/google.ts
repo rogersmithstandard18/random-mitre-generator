@@ -84,7 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Check if user exists in Supabase
-    const { data: updateUser, error: updateError } = await supabaseAdmin
+    const { data: newUser, error: insertError } = await supabaseAdmin
       .from('users')
       .update({ name, picture })
       .eq('id', userId)
