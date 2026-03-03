@@ -12,6 +12,7 @@ interface TierFeatures {
   canPlayScenarios: boolean;
   canUseScenarioFilters: boolean;
   canTrackScenarioProgress: boolean;
+  canAccessCaseFiles: boolean;
 }
 
 export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
@@ -24,6 +25,7 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canPlayScenarios: false,
     canUseScenarioFilters: false,
     canTrackScenarioProgress: false,
+    canAccessCaseFiles: false,
   },
   starter: {
     canUseFilters: true,
@@ -34,6 +36,7 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canPlayScenarios: true,
     canUseScenarioFilters: false,
     canTrackScenarioProgress: false,
+    canAccessCaseFiles: false,
   },
   professional: {
     canUseFilters: true,
@@ -44,6 +47,7 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canPlayScenarios: true,
     canUseScenarioFilters: true,
     canTrackScenarioProgress: true,
+    canAccessCaseFiles: true,
   },
   team: {
     canUseFilters: true,
@@ -54,6 +58,7 @@ export const TIER_FEATURES: Record<UserTier, TierFeatures> = {
     canPlayScenarios: true,
     canUseScenarioFilters: true,
     canTrackScenarioProgress: true,
+    canAccessCaseFiles: true,
   },
 };
 
