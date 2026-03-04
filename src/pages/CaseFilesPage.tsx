@@ -63,11 +63,28 @@ const CATEGORY_ICONS: Record<string, typeof FileText> = {
   cloud: Server, email: FileText, context: Eye, forensics: Terminal,
 };
 
+const LEVEL_COLORS: Record<number, { bg: string; border: string; text: string; bar: string }> = {
+  1: { bg: 'rgba(20,184,166,0.15)', border: 'rgba(20,184,166,0.4)', text: '#14b8a6', bar: '#14b8a6' },
+  2: { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', text: '#f59e0b', bar: '#f59e0b' },
+  3: { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)', text: '#8b5cf6', bar: '#8b5cf6' },
+};
+
 function levelColor(level: number) {
-  if (level === 1) return { bg: 'rgba(20,184,166,0.15)', border: 'rgba(20,184,166,0.4)', text: '#14b8a6', bar: '#14b8a6' };
-  if (level === 2) return { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', text: '#f59e0b', bar: '#f59e0b' };
-  return { bg: 'rgba(139,92,246,0.15)', border: 'rgba(139,92,246,0.4)', text: '#8b5cf6', bar: '#8b5cf6' };
+  return LEVEL_COLORS[level] || LEVEL_COLORS[3];
 }
+
+const TICKET_TEXT_FIELDS: { key: keyof TicketDraft; label: string; ph: string }[] = [
+  { key: 'alert_summary', label: 'Alert Summary', ph: 'What do you believe is happening...' },
+  { key: 'evidence_collected', label: 'Evidence Referenced', ph: 'Which logs or data points support this?' },
+  { key: 'actions_taken', label: 'Actions Taken', ph: 'What containment or response steps...' },
+  { key: 'escalation_notes', label: 'Escalation Notes', ph: 'Who needs to know and why...' },
+  { key: 'open_questions', label: 'Open Questions', ph: 'What still needs one validating check?' },
+];
+
+const TICKET_LEVEL_FIELDS: { field: 'severity' | 'confidence'; label: string; colors: string[] }[] = [
+  { field: 'severity', label: 'Severity', colors: ['#22c55e', '#f59e0b', '#ef4444'] },
+  { field: 'confidence', label: 'Confidence', colors: ['rgba(255,255,255,0.5)', '#14b8a6', '#f59e0b'] },
+];
 
 /* ═══════════════════════════════════════════════════════════
    LOADING SCREEN
@@ -268,9 +285,12 @@ export default function CaseFilesPage() {
   useEffect(() => {
     if (!features.canAccessCaseFiles || !token) { setLoading(false); return; }
     fetch('/api/case-files/scenarios', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to fetch scenarios');
+        return data;
+      })
       .then(data => {
-        if (data.error) throw new Error(data.error);
         const s = data.scenarios || [];
         setScenarios(s);
         if (s.length) { setActiveScenario(s[0]); setPhase('investigate'); }
@@ -638,32 +658,23 @@ export default function CaseFilesPage() {
           </div>
 
           {/* Text fields */}
-          {[
-            { key: 'alert_summary', label: 'Alert Summary', ph: 'What do you believe is happening...' },
-            { key: 'evidence_collected', label: 'Evidence Referenced', ph: 'Which logs or data points support this?' },
-            { key: 'actions_taken', label: 'Actions Taken', ph: 'What containment or response steps...' },
-            { key: 'escalation_notes', label: 'Escalation Notes', ph: 'Who needs to know and why...' },
-            { key: 'open_questions', label: 'Open Questions', ph: 'What still needs one validating check?' },
-          ].map(({ key, label, ph }) => (
+          {TICKET_TEXT_FIELDS.map(({ key, label, ph }) => (
             <div key={key}>
               <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>{label}</label>
-              <textarea value={(ticket as any)[key]} onChange={e => setTicket(t => ({ ...t, [key]: e.target.value }))} placeholder={ph}
+              <textarea value={ticket[key] as string} onChange={e => setTicket(t => ({ ...t, [key]: e.target.value }))} placeholder={ph}
                 style={{ width: '100%', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 12, fontSize: 14, color: 'rgba(255,255,255,0.8)', resize: 'vertical', height: 72, boxSizing: 'border-box', outline: 'none', fontFamily: 'inherit' }} />
             </div>
           ))}
 
           {/* Severity + Confidence */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            {[
-              { field: 'severity' as const, label: 'Severity', colors: ['#22c55e', '#f59e0b', '#ef4444'] },
-              { field: 'confidence' as const, label: 'Confidence', colors: ['rgba(255,255,255,0.5)', '#14b8a6', '#f59e0b'] },
-            ].map(({ field, label, colors: tc }) => (
+            {TICKET_LEVEL_FIELDS.map(({ field, label, colors: tc }) => (
               <div key={field}>
                 <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6, textAlign: 'center' }}>{label}</label>
                 <div style={{ display: 'flex', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', height: 36 }}>
                   {(['low', 'medium', 'high'] as const).map((o, i) => (
                     <button key={o} onClick={() => { snd.click(); setTicket(t => ({ ...t, [field]: o })); }}
-                      style={{ flex: 1, fontSize: 9, textTransform: 'uppercase', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: (ticket as any)[field] === o ? 'rgba(255,255,255,0.12)' : 'transparent', color: (ticket as any)[field] === o ? tc[i] : 'rgba(255,255,255,0.3)' }}>
+                      style={{ flex: 1, fontSize: 9, textTransform: 'uppercase', fontWeight: 900, border: 'none', cursor: 'pointer', transition: 'all 0.15s', background: ticket[field] === o ? 'rgba(255,255,255,0.12)' : 'transparent', color: ticket[field] === o ? tc[i] : 'rgba(255,255,255,0.3)' }}>
                       {o}
                     </button>
                   ))}
