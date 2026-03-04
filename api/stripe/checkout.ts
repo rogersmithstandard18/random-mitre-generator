@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import Stripe from 'stripe';
-import * as jwt from 'jsonwebtoken';
+import { verifyAuth } from '../lib/auth.js';
 
 
 const SUPPORT_EMAIL = 'socialfunnels@gmail.com';
@@ -22,13 +22,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Validate configuration
-    const jwtSecret = process.env.JWT_SECRET;
-    if (!jwtSecret) {
-      console.error('JWT_SECRET environment variable is not set');
-      return res.status(500).json({ error: 'Server configuration error' });
-    }
-
     // Check if any price IDs are missing
     const missingPrices = Object.entries(PRICE_IDS)
       .filter(([_, price]) => !price)
@@ -42,21 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Get user from auth token
-    const authHeader = req.headers.authorization;
-    if (!authHeader?.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Unauthorized - please login first' });
-    }
-
-    const token = authHeader.substring(7);
-
-    // Use the verify method safely
-    const verifyFunc = (jwt as any).default?.verify || (jwt as any).verify;
-    if (typeof verifyFunc !== 'function') {
-      throw new Error('JWT verify is not a function');
-    }
-
-    const decoded = verifyFunc(token, jwtSecret) as { id: string; email: string };
+    const decoded = verifyAuth(req, res);
+    if (!decoded) return;
 
     const { tier } = req.body;
     const validTiers = ['starter', 'professional', 'team'];

@@ -1,6 +1,7 @@
 export interface EvidenceItem {
   item: string;
   category: string;
+  content?: string;
 }
 
 export interface DecisionOption {

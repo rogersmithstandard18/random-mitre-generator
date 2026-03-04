@@ -15,6 +15,7 @@ import { useAuthStore } from './store/authStore';
 function AppContent() {
   const location = useLocation();
   const isSalesPage = location.pathname === '/';
+  const isCaseFilesPage = location.pathname === '/case-files';
   const isPaymentPage = location.pathname.startsWith('/payment');
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -48,6 +49,10 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<SalesPage />} />
         </Routes>
+      ) : isCaseFilesPage ? (
+        <Routes>
+          <Route path="/case-files" element={<CaseFilesPage />} />
+        </Routes>
       ) : isPaymentPage ? (
         <div className="page">
           <Routes>
@@ -60,7 +65,6 @@ function AppContent() {
           <Routes>
             <Route path="/learn" element={<CardPage />} />
             <Route path="/scenarios" element={<ScenariosPage />} />
-            <Route path="/case-files" element={<CaseFilesPage />} />
             <Route path="/history" element={<HistoryPage />} />
           </Routes>
         </div>
