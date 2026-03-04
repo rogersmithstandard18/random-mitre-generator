@@ -133,7 +133,7 @@ function LoadingScreen({ caseLabel }: { caseLabel: string }) {
    EVIDENCE MODAL
 ═══════════════════════════════════════════════════════════ */
 interface EvidenceModalProps {
-  item: { item: string; category: string };
+  item: { item: string; category: string; content?: string };
   investigation: { check: string; where: string; confirm: string } | null;
   onClose: () => void;
 }
@@ -146,8 +146,9 @@ function EvidenceModal({ item, investigation, onClose }: EvidenceModalProps) {
   const Icon = CATEGORY_ICONS[item.category] || FileText;
   return (
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: '#0d0f18', border: '1px solid rgba(20,184,166,0.3)', borderRadius: 16, width: '100%', maxWidth: 500, overflow: 'hidden', animation: 'cf-slideUp 0.22s ease-out' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#0d0f18', border: '1px solid rgba(20,184,166,0.3)', borderRadius: 16, width: '100%', maxWidth: 620, maxHeight: '85vh', display: 'flex', flexDirection: 'column', overflow: 'hidden', animation: 'cf-slideUp 0.22s ease-out' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ padding: 8, background: 'rgba(20,184,166,0.1)', borderRadius: 8, border: '1px solid rgba(20,184,166,0.2)' }}>
               <Icon size={16} color="#14b8a6" />
@@ -161,7 +162,20 @@ function EvidenceModal({ item, investigation, onClose }: EvidenceModalProps) {
             <X size={14} />
           </button>
         </div>
-        <div style={{ padding: 20 }}>
+        {/* Scrollable body */}
+        <div style={{ padding: 20, overflowY: 'auto', flex: 1 }}>
+          {/* Evidence artifact terminal block */}
+          {item.content && (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 9, color: '#f59e0b', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Terminal size={10} color="#f59e0b" /> Evidence Artifact
+              </div>
+              <pre style={{ background: '#040608', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '12px 14px', fontSize: 11, fontFamily: '"Courier New", Courier, monospace', color: '#86efac', lineHeight: 1.65, overflowX: 'auto', maxHeight: 260, margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                {item.content}
+              </pre>
+            </div>
+          )}
+          {/* Investigation guide */}
           {investigation ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -179,11 +193,11 @@ function EvidenceModal({ item, investigation, onClose }: EvidenceModalProps) {
                 </div>
               ))}
             </>
-          ) : (
+          ) : !item.content ? (
             <div style={{ padding: '16px 0', textAlign: 'center' }}>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Review this evidence source during your investigation.</p>
             </div>
-          )}
+          ) : null}
           <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 10, color: '#22c55e', fontWeight: 700, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 4 }}>
               <CheckCircle2 size={12} /> Evidence reviewed
@@ -259,6 +273,16 @@ export default function CaseFilesPage() {
   const [history, setHistory] = useState<{ title: string; correct: boolean | null }[]>([]);
   const [casesSolved, setCasesSolved] = useState(0);
 
+  // AI Debrief
+  const [debriefFeedback, setDebriefFeedback] = useState<{
+    verdict_line: string;
+    strengths: string[];
+    gaps: string[];
+    key_insight: string;
+    next_focus: string;
+  } | null>(null);
+  const [debriefLoading, setDebriefLoading] = useState(false);
+
   const resetDrillState = useCallback(() => {
     setMissionChecked(new Set());
     setEvidenceReviewed(new Set());
@@ -271,6 +295,8 @@ export default function CaseFilesPage() {
     setTicket(BLANK_TICKET);
     setSubmitError(null);
     setResultCorrect(null);
+    setDebriefFeedback(null);
+    setDebriefLoading(false);
     setTab('brief');
   }, []);
 
@@ -328,6 +354,44 @@ export default function CaseFilesPage() {
       setCasesSolved(p => p + 1);
       setHistory(p => [...p.slice(-4), { title: activeScenario.title, correct }]);
       setPhase('result');
+
+      // Fire AI debrief (non-blocking — failure is silent)
+      setDebriefLoading(true);
+      fetch('/api/case-files/debrief', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          scenario: {
+            title: activeScenario.title,
+            subtitle: activeScenario.subtitle,
+            scenario_text: activeScenario.scenario_text,
+            real_or_noise_default: activeScenario.real_or_noise_default,
+            mission_steps: activeScenario.mission_steps,
+            evidence_locker: activeScenario.evidence_locker,
+          },
+          submission: {
+            verdict: ticket.real_or_noise,
+            alert_summary: ticket.alert_summary,
+            evidence_collected: ticket.evidence_collected,
+            actions_taken: ticket.actions_taken,
+            escalation_notes: ticket.escalation_notes,
+            open_questions: ticket.open_questions,
+            severity: ticket.severity,
+            confidence: ticket.confidence,
+            escalated: ticket.escalated,
+          },
+          progress: {
+            missionChecked: Array.from(missionChecked),
+            evidenceReviewed: Array.from(evidenceReviewed),
+            scopeSelections: Array.from(scopeSelections),
+            escalationSelections: Array.from(escalationSelections),
+          },
+        }),
+      })
+        .then(r => r.json())
+        .then(d => { if (d.feedback) setDebriefFeedback(d.feedback); })
+        .catch(() => {})
+        .finally(() => setDebriefLoading(false));
     } catch (err: any) {
       setSubmitError(err.message);
     } finally {
@@ -613,13 +677,43 @@ export default function CaseFilesPage() {
             )}
           </div>
 
-          {/* Debrief */}
+          {/* AI Debrief */}
           <div style={{ background: 'rgba(255,255,255,0.03)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
-            <p style={{ fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 8px 0' }}>Investigation Debrief</p>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: 0 }}>
-              You completed {missionDone}/{missionTotal} mission steps, reviewed {evidenceReviewed.size}/{activeScenario.evidence_locker.length} evidence sources, and scoped {scopeSelections.size} impact area{scopeSelections.size !== 1 ? 's' : ''}.
-              {ticket.escalated ? ' Escalation was flagged.' : ''}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: debriefLoading ? '#f59e0b' : '#14b8a6', animation: debriefLoading ? 'cf-pulse 1s ease-in-out infinite' : undefined }} />
+              <p style={{ fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+                {debriefLoading ? 'Senior Analyst Reviewing...' : 'AI Debrief'}
+              </p>
+            </div>
+            {debriefFeedback ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.8)', lineHeight: 1.6, margin: 0 }}>{debriefFeedback.verdict_line}</p>
+                {[
+                  { label: 'Strengths', items: debriefFeedback.strengths, color: '#22c55e' },
+                  { label: 'Areas to sharpen', items: debriefFeedback.gaps, color: '#f59e0b' },
+                ].map(({ label, items, color }) => (
+                  <div key={label}>
+                    <p style={{ fontSize: 9, color, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 6px 0' }}>{label}</p>
+                    {items.map((it, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 4, alignItems: 'flex-start' }}>
+                        <span style={{ color, fontSize: 12, marginTop: 1, flexShrink: 0 }}>›</span>
+                        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5, margin: 0 }}>{it}</p>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+                <div style={{ padding: '10px 14px', background: 'rgba(20,184,166,0.05)', borderRadius: 8, border: '1px solid rgba(20,184,166,0.15)', marginTop: 4 }}>
+                  <p style={{ fontSize: 9, color: '#14b8a6', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 4px 0' }}>Key Insight</p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, margin: 0 }}>{debriefFeedback.key_insight}</p>
+                </div>
+              </div>
+            ) : (
+              <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, margin: 0, fontStyle: debriefLoading ? 'italic' : 'normal' }}>
+                {debriefLoading
+                  ? 'Analyzing your investigation approach...'
+                  : `Completed ${missionDone}/${missionTotal} steps, reviewed ${evidenceReviewed.size}/${activeScenario.evidence_locker.length} evidence sources.${ticket.escalated ? ' Escalation flagged.' : ''}`}
+              </p>
+            )}
           </div>
 
           {/* Stats */}
