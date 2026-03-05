@@ -34,6 +34,18 @@ export interface LearningBridge {
   investigation_ladder?: InvestigationLadderStep[];
 }
 
+export interface PlaybookStep {
+  id: string;
+  task: string;
+  detail: string;
+  finding: string;
+}
+
+export interface Playbook {
+  stages: string[];
+  steps: Record<string, PlaybookStep[]>;
+}
+
 export interface CaseFileScenario {
   id: string;
   onetsoc_code: string;
@@ -51,6 +63,7 @@ export interface CaseFileScenario {
   escalation_options: string[];
   learning_bridge: LearningBridge | null;
   pause_prompt: string | null;
+  playbook: Playbook | null;
   is_active: boolean;
   is_pro_only: boolean;
 }

@@ -6,7 +6,7 @@ import {
   Server, Clock, X, ChevronDown
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
-import type { CaseFileScenario, TicketDraft } from '@/types/CaseFile';
+import type { CaseFileScenario, TicketDraft, PlaybookStep } from '@/types/CaseFile';
 
 /* ═══════════════════════════════════════════════════════════
    SOUNDS
@@ -266,6 +266,8 @@ export default function CaseFilesPage() {
   const [missionChecked, setMissionChecked] = useState<Set<number>>(new Set());
   const [missionStepOrder, setMissionStepOrder] = useState<number[]>([]);
   const [playbookTab, setPlaybookTab] = useState<'preparation' | 'analysis' | 'containment'>('analysis');
+  const [playbookChecked, setPlaybookChecked] = useState<Set<string>>(new Set());
+  const [playbookFindings, setPlaybookFindings] = useState<string[]>([]);
   const [evidenceReviewed, setEvidenceReviewed] = useState<Set<number>>(new Set());
   const [scopeSelections, setScopeSelections] = useState<Set<string>>(new Set());
   const [escalationSelections, setEscalationSelections] = useState<Set<string>>(new Set());
@@ -298,6 +300,8 @@ export default function CaseFilesPage() {
     setMissionChecked(new Set());
     setMissionStepOrder([]);
     setPlaybookTab('analysis');
+    setPlaybookChecked(new Set());
+    setPlaybookFindings([]);
     setEvidenceReviewed(new Set());
     setScopeSelections(new Set());
     setEscalationSelections(new Set());
@@ -456,11 +460,14 @@ export default function CaseFilesPage() {
   if (!activeScenario) return null;
 
   const colors = levelColor(activeScenario.level);
-  const missionTotal = activeScenario.mission_steps.length;
-  const missionDone = missionChecked.size;
+  const allPlaybookSteps: PlaybookStep[] = activeScenario.playbook
+    ? Object.values(activeScenario.playbook.steps).flat()
+    : [];
+  const missionTotal = activeScenario.playbook ? allPlaybookSteps.length : activeScenario.mission_steps.length;
+  const missionDone = activeScenario.playbook ? playbookChecked.size : missionChecked.size;
   const bridge = activeScenario.learning_bridge;
   const canSubmit = ticket.real_or_noise && ticket.alert_summary.trim().length > 10 && ticket.severity && ticket.confidence;
-  const investigateStarted = missionChecked.size > 0 || evidenceReviewed.size > 0;
+  const investigateStarted = (activeScenario.playbook ? playbookChecked.size > 0 : missionChecked.size > 0) || evidenceReviewed.size > 0;
   const currentStep = phase === 'result' ? 3 : investigateStarted ? 2 : 1;
 
   /* ── Brief Panel (left) ── */
@@ -547,32 +554,58 @@ export default function CaseFilesPage() {
         </div>
         {/* Steps for active tab */}
         <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {(() => {
-            const n = activeScenario.mission_steps.length;
-            const p1 = Math.ceil(n / 3);
-            const p2 = Math.ceil(n * 2 / 3);
-            const ranges: Record<string, [number, number]> = { preparation: [0, p1], analysis: [p1, p2], containment: [p2, n] };
-            const [start, end] = ranges[playbookTab];
-            return activeScenario.mission_steps.slice(start, end).map((step, relIdx) => {
-              const i = start + relIdx;
-              const done = missionChecked.has(i);
-              const parts = step.split(':');
-              const stepTitle = parts[0].trim();
-              const stepDesc = parts.slice(1).join(':').trim();
+          {activeScenario.playbook ? (
+            // ── Structured playbook mode ──
+            (activeScenario.playbook.steps[activeScenario.playbook.stages.find(s => s.toLowerCase() === playbookTab) ?? ''] ?? []).map((step: PlaybookStep) => {
+              const done = playbookChecked.has(step.id);
               return (
-                <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) { next.delete(i); setMissionStepOrder(o => o.filter(x => x !== i)); } else { next.add(i); setMissionStepOrder(o => [...o, i]); } setMissionChecked(next); }}
+                <div key={step.id} onClick={() => {
+                  snd.step();
+                  const next = new Set(playbookChecked);
+                  if (done) { next.delete(step.id); setPlaybookFindings(f => f.filter(x => x !== step.finding)); }
+                  else { next.add(step.id); setPlaybookFindings(f => [...f, step.finding]); }
+                  setPlaybookChecked(next);
+                }}
                   style={{ padding: '12px 14px', borderRadius: 10, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.18s', border: done ? '1px solid rgba(20,184,166,0.35)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(20,184,166,0.08)' : 'rgba(255,255,255,0.02)' }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', border: done ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.2)', background: done ? '#14b8a6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.18s' }}>
                     {done && <CheckCircle2 size={11} color="#fff" />}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.4, margin: 0, color: done ? '#14b8a6' : '#fff', transition: 'color 0.18s' }}>{stepTitle}</p>
-                    {stepDesc && <p style={{ fontSize: 12, lineHeight: 1.4, margin: '3px 0 0', color: 'rgba(255,255,255,0.4)' }}>{stepDesc}</p>}
+                    <p style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.4, margin: 0, color: done ? '#14b8a6' : '#fff', transition: 'color 0.18s' }}>{step.task}</p>
+                    <p style={{ fontSize: 12, lineHeight: 1.4, margin: '3px 0 0', color: 'rgba(255,255,255,0.4)' }}>{step.detail}</p>
                   </div>
                 </div>
               );
-            });
-          })()}
+            })
+          ) : (
+            // ── Legacy mission_steps fallback ──
+            (() => {
+              const n = activeScenario.mission_steps.length;
+              const p1 = Math.ceil(n / 3);
+              const p2 = Math.ceil(n * 2 / 3);
+              const ranges: Record<string, [number, number]> = { preparation: [0, p1], analysis: [p1, p2], containment: [p2, n] };
+              const [start, end] = ranges[playbookTab];
+              return activeScenario.mission_steps.slice(start, end).map((step, relIdx) => {
+                const i = start + relIdx;
+                const done = missionChecked.has(i);
+                const parts = step.split(':');
+                const stepTitle = parts[0].trim();
+                const stepDesc = parts.slice(1).join(':').trim();
+                return (
+                  <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) { next.delete(i); setMissionStepOrder(o => o.filter(x => x !== i)); } else { next.add(i); setMissionStepOrder(o => [...o, i]); } setMissionChecked(next); }}
+                    style={{ padding: '12px 14px', borderRadius: 10, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.18s', border: done ? '1px solid rgba(20,184,166,0.35)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(20,184,166,0.08)' : 'rgba(255,255,255,0.02)' }}>
+                    <div style={{ width: 22, height: 22, borderRadius: '50%', border: done ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.2)', background: done ? '#14b8a6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.18s' }}>
+                      {done && <CheckCircle2 size={11} color="#fff" />}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.4, margin: 0, color: done ? '#14b8a6' : '#fff', transition: 'color 0.18s' }}>{stepTitle}</p>
+                      {stepDesc && <p style={{ fontSize: 12, lineHeight: 1.4, margin: '3px 0 0', color: 'rgba(255,255,255,0.4)' }}>{stepDesc}</p>}
+                    </div>
+                  </div>
+                );
+              });
+            })()
+          )}
         </div>
       </section>
 
@@ -805,21 +838,34 @@ export default function CaseFilesPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
               <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Technical Findings Log</label>
-              <span style={{ fontSize: 9, color: missionStepOrder.length > 0 ? '#14b8a6' : 'rgba(255,255,255,0.2)', fontFamily: 'monospace', fontWeight: 700 }}>{missionStepOrder.length}/{missionTotal} logged</span>
+              <span style={{ fontSize: 9, color: (activeScenario.playbook ? playbookFindings.length : missionStepOrder.length) > 0 ? '#14b8a6' : 'rgba(255,255,255,0.2)', fontFamily: 'monospace', fontWeight: 700 }}>{activeScenario.playbook ? playbookFindings.length : missionStepOrder.length}/{missionTotal} logged</span>
             </div>
             <div style={{ background: 'rgba(0,0,0,0.35)', border: missionStepOrder.length > 0 ? '1px solid rgba(20,184,166,0.2)' : '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', minHeight: 60, display: 'flex', flexDirection: 'column', gap: 7, transition: 'border-color 0.3s' }}>
-              {missionStepOrder.length === 0 ? (
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', textAlign: 'center', padding: '6px 0' }}>No steps completed. Findings will appear here as you investigate...</p>
-              ) : (
-                missionStepOrder.map((stepIdx) => {
-                  const stepTitle = activeScenario.mission_steps[stepIdx].split(':')[0].trim();
-                  return (
-                    <div key={stepIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              {activeScenario.playbook ? (
+                playbookFindings.length === 0 ? (
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', textAlign: 'center', padding: '6px 0' }}>No steps completed. Findings will appear here as you investigate...</p>
+                ) : (
+                  playbookFindings.map((finding, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                       <span style={{ color: '#14b8a6', fontSize: 13, flexShrink: 0, marginTop: 1 }}>•</span>
-                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.45, margin: 0 }}>{stepTitle} — confirmed and documented.</p>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.45, margin: 0 }}>{finding}</p>
                     </div>
-                  );
-                })
+                  ))
+                )
+              ) : (
+                missionStepOrder.length === 0 ? (
+                  <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', textAlign: 'center', padding: '6px 0' }}>No steps completed. Findings will appear here as you investigate...</p>
+                ) : (
+                  missionStepOrder.map((stepIdx) => {
+                    const stepTitle = activeScenario.mission_steps[stepIdx].split(':')[0].trim();
+                    return (
+                      <div key={stepIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                        <span style={{ color: '#14b8a6', fontSize: 13, flexShrink: 0, marginTop: 1 }}>•</span>
+                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.45, margin: 0 }}>{stepTitle} — confirmed and documented.</p>
+                      </div>
+                    );
+                  })
+                )
               )}
             </div>
             {missionStepOrder.length > 0 && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 5, marginBottom: 0 }}>Auto-logged from playbook. Add your analysis in the fields below.</p>}

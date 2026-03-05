@@ -6,7 +6,7 @@ const SCENARIO_COLUMNS = [
   'id', 'onetsoc_code', 'scenario_number', 'level', 'level_label',
   'title', 'subtitle', 'scenario_text', 'real_or_noise_default',
   'mission_steps', 'scope_options', 'evidence_locker', 'decision_options',
-  'escalation_options', 'learning_bridge', 'pause_prompt', 'is_active', 'is_pro_only',
+  'escalation_options', 'learning_bridge', 'pause_prompt', 'playbook', 'is_active', 'is_pro_only',
 ].join(', ');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
