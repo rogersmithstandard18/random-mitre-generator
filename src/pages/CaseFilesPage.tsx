@@ -63,6 +63,15 @@ const CATEGORY_ICONS: Record<string, typeof FileText> = {
   cloud: Server, email: FileText, context: Eye, forensics: Terminal,
 };
 
+const ROLE_LABELS: Record<string, string> = {
+  '15-1212.00': 'Information Security Analyst',
+  '15-1232.00': 'IT Help Desk / Support Specialist',
+  '15-1231.00': 'Network Support Specialist',
+  '15-1244.00': 'Network & Systems Administrator',
+  '15-1211.00': 'Computer Systems Analyst',
+  '15-1299.09': 'Information Technology Project Manager',
+};
+
 const LEVEL_COLORS: Record<number, { bg: string; border: string; text: string; bar: string }> = {
   1: { bg: 'rgba(20,184,166,0.15)', border: 'rgba(20,184,166,0.4)', text: '#14b8a6', bar: '#14b8a6' },
   2: { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', text: '#f59e0b', bar: '#f59e0b' },
@@ -447,6 +456,8 @@ export default function CaseFilesPage() {
   const missionDone = missionChecked.size;
   const bridge = activeScenario.learning_bridge;
   const canSubmit = ticket.real_or_noise && ticket.alert_summary.trim().length > 10 && ticket.severity && ticket.confidence;
+  const investigateStarted = missionChecked.size > 0 || evidenceReviewed.size > 0;
+  const currentStep = phase === 'result' ? 3 : investigateStarted ? 2 : 1;
 
   /* ── Brief Panel (left) ── */
   const BriefPanel = (
@@ -498,6 +509,13 @@ export default function CaseFilesPage() {
             </div>
           ))}
         </div>
+      )}
+      {/* Next step CTA */}
+      {phase !== 'result' && (
+        <button onClick={() => { snd.click(); setTab('investigate'); }}
+          style={{ width: '100%', padding: 14, background: 'rgba(20,184,166,0.07)', border: '1px solid rgba(20,184,166,0.22)', borderRadius: 10, color: '#14b8a6', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Step 2: Begin Investigation <ArrowRight size={13} />
+        </button>
       )}
     </div>
   );
@@ -645,6 +663,13 @@ export default function CaseFilesPage() {
           )}
         </section>
       )}
+      {/* Next step CTA */}
+      {phase !== 'result' && investigateStarted && (
+        <button onClick={() => { snd.click(); setTab('ticket'); }}
+          style={{ width: '100%', padding: 14, background: 'rgba(20,184,166,0.07)', border: '1px solid rgba(20,184,166,0.22)', borderRadius: 10, color: '#14b8a6', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Step 3: File Your Report <ArrowRight size={13} />
+        </button>
+      )}
     </div>
   );
 
@@ -656,6 +681,7 @@ export default function CaseFilesPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: phase === 'result' ? '#14b8a6' : '#ef4444', animation: phase === 'result' ? undefined : 'cf-pulse 1.5s ease-in-out infinite' }} />
           <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Incident Ticket</span>
+          <span style={{ fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(255,255,255,0.05)', padding: '2px 7px', borderRadius: 6 }}>Step 3</span>
         </div>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 4 }}>
           <Clock size={12} /> Case {activeScenario.scenario_number}
@@ -816,6 +842,17 @@ export default function CaseFilesPage() {
               <h1 style={{ fontSize: 14, fontWeight: 900, color: '#fff', textTransform: 'uppercase', fontStyle: 'italic', letterSpacing: '-0.01em', margin: 0, lineHeight: 1 }}>Sentinel Investigation</h1>
               <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.12em', margin: 0 }}>Case File Workbook</p>
             </div>
+            {/* Vertical divider */}
+            <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.08)', marginLeft: 4 }} />
+            {/* Role badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'rgba(20,184,166,0.08)', border: '1px solid rgba(20,184,166,0.2)', borderRadius: 20 }}>
+                <Briefcase size={10} color="#14b8a6" />
+                <span style={{ fontSize: 10, color: '#14b8a6', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
+                  {activeScenario ? (ROLE_LABELS[activeScenario.onetsoc_code] ?? 'Security Analyst') : 'Security Analyst'}
+                </span>
+              </div>
+            </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             {[
@@ -832,13 +869,40 @@ export default function CaseFilesPage() {
                 <User size={14} color="#fff" />
               </div>
               <div>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Analyst</p>
+                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, margin: 0, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{activeScenario ? (ROLE_LABELS[activeScenario.onetsoc_code] ?? 'Security Analyst') : 'Security Analyst'}</p>
                 <p style={{ fontSize: 12, fontWeight: 900, color: '#14b8a6', margin: 0, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userName}</p>
               </div>
             </div>
           </div>
         </div>
       </header>
+
+      {/* Step progress bar */}
+      <div style={{ background: 'rgba(20,184,166,0.04)', borderBottom: '1px solid rgba(20,184,166,0.12)', padding: '14px 24px' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center' }}>
+          {([
+            { n: 1, label: 'Read Brief',   tab: 'brief'       as const },
+            { n: 2, label: 'Investigate',  tab: 'investigate' as const },
+            { n: 3, label: 'File Report',  tab: 'ticket'      as const },
+          ] as const).map(({ n, label, tab: t }, i) => {
+            const done   = currentStep > n || phase === 'result';
+            const active = currentStep === n && phase !== 'result';
+            return (
+              <div key={n} style={{ display: 'contents' }}>
+                {i > 0 && <div style={{ flex: 1, height: 2, background: done ? 'rgba(34,197,94,0.6)' : 'rgba(255,255,255,0.1)', transition: 'background 0.4s', margin: '0 4px' }} />}
+                <button onClick={() => { snd.click(); setTab(t); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '4px 10px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 10, flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: done ? '2px solid #22c55e' : active ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.15)', background: done ? 'rgba(34,197,94,0.15)' : active ? 'rgba(20,184,166,0.18)' : 'rgba(255,255,255,0.03)', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', transition: 'all 0.3s', boxShadow: active ? '0 0 0 4px rgba(20,184,166,0.12)' : 'none', flexShrink: 0 }}>
+                    {done ? '✓' : n}
+                  </div>
+                  <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap', transition: 'color 0.3s' }}>
+                    {label}
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Mobile tabs */}
       <div style={{ display: 'none' }} className="cf-mobile-tabs">
