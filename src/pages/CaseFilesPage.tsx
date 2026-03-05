@@ -456,6 +456,8 @@ export default function CaseFilesPage() {
   const missionDone = missionChecked.size;
   const bridge = activeScenario.learning_bridge;
   const canSubmit = ticket.real_or_noise && ticket.alert_summary.trim().length > 10 && ticket.severity && ticket.confidence;
+  const investigateStarted = missionChecked.size > 0 || evidenceReviewed.size > 0;
+  const currentStep = phase === 'result' ? 3 : investigateStarted ? 2 : 1;
 
   /* ── Brief Panel (left) ── */
   const BriefPanel = (
@@ -507,6 +509,13 @@ export default function CaseFilesPage() {
             </div>
           ))}
         </div>
+      )}
+      {/* Next step CTA */}
+      {phase !== 'result' && (
+        <button onClick={() => { snd.click(); setTab('investigate'); }}
+          style={{ width: '100%', padding: 14, background: 'rgba(20,184,166,0.07)', border: '1px solid rgba(20,184,166,0.22)', borderRadius: 10, color: '#14b8a6', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Step 2: Begin Investigation <ArrowRight size={13} />
+        </button>
       )}
     </div>
   );
@@ -654,6 +663,13 @@ export default function CaseFilesPage() {
           )}
         </section>
       )}
+      {/* Next step CTA */}
+      {phase !== 'result' && investigateStarted && (
+        <button onClick={() => { snd.click(); setTab('ticket'); }}
+          style={{ width: '100%', padding: 14, background: 'rgba(20,184,166,0.07)', border: '1px solid rgba(20,184,166,0.22)', borderRadius: 10, color: '#14b8a6', fontSize: 11, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Step 3: File Your Report <ArrowRight size={13} />
+        </button>
+      )}
     </div>
   );
 
@@ -665,6 +681,7 @@ export default function CaseFilesPage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: phase === 'result' ? '#14b8a6' : '#ef4444', animation: phase === 'result' ? undefined : 'cf-pulse 1.5s ease-in-out infinite' }} />
           <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Incident Ticket</span>
+          <span style={{ fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(255,255,255,0.05)', padding: '2px 7px', borderRadius: 6 }}>Step 3</span>
         </div>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 4 }}>
           <Clock size={12} /> Case {activeScenario.scenario_number}
@@ -859,6 +876,33 @@ export default function CaseFilesPage() {
           </div>
         </div>
       </header>
+
+      {/* Step progress bar */}
+      <div style={{ background: '#0d0f18', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '10px 16px' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center' }}>
+          {([
+            { n: 1, label: 'Read Brief',   tab: 'brief'       as const },
+            { n: 2, label: 'Investigate',  tab: 'investigate' as const },
+            { n: 3, label: 'File Report',  tab: 'ticket'      as const },
+          ] as const).map(({ n, label, tab: t }, i) => {
+            const done   = currentStep > n || phase === 'result';
+            const active = currentStep === n && phase !== 'result';
+            return (
+              <div key={n} style={{ display: 'contents' }}>
+                {i > 0 && <div style={{ flex: 1, height: 1, background: done ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,255,0.08)', transition: 'background 0.4s' }} />}
+                <button onClick={() => { snd.click(); setTab(t); }} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 8, flexShrink: 0 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, border: done ? '2px solid #22c55e' : active ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.12)', background: done ? 'rgba(34,197,94,0.12)' : active ? 'rgba(20,184,166,0.12)' : 'transparent', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.2)', transition: 'all 0.3s', flexShrink: 0 }}>
+                    {done ? '✓' : n}
+                  </div>
+                  <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
+                    {label}
+                  </span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       {/* Mobile tabs */}
       <div style={{ display: 'none' }} className="cf-mobile-tabs">
