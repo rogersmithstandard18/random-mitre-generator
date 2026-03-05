@@ -63,6 +63,15 @@ const CATEGORY_ICONS: Record<string, typeof FileText> = {
   cloud: Server, email: FileText, context: Eye, forensics: Terminal,
 };
 
+const ROLE_LABELS: Record<string, string> = {
+  '15-1212.00': 'Information Security Analyst',
+  '15-1232.00': 'IT Help Desk / Support Specialist',
+  '15-1231.00': 'Network Support Specialist',
+  '15-1244.00': 'Network & Systems Administrator',
+  '15-1211.00': 'Computer Systems Analyst',
+  '15-1299.09': 'Information Technology Project Manager',
+};
+
 const LEVEL_COLORS: Record<number, { bg: string; border: string; text: string; bar: string }> = {
   1: { bg: 'rgba(20,184,166,0.15)', border: 'rgba(20,184,166,0.4)', text: '#14b8a6', bar: '#14b8a6' },
   2: { bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.4)', text: '#f59e0b', bar: '#f59e0b' },
@@ -815,6 +824,17 @@ export default function CaseFilesPage() {
             <div>
               <h1 style={{ fontSize: 14, fontWeight: 900, color: '#fff', textTransform: 'uppercase', fontStyle: 'italic', letterSpacing: '-0.01em', margin: 0, lineHeight: 1 }}>Sentinel Investigation</h1>
               <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.12em', margin: 0 }}>Case File Workbook</p>
+            </div>
+            {/* Vertical divider */}
+            <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.08)', marginLeft: 4 }} />
+            {/* Role badge */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'rgba(20,184,166,0.08)', border: '1px solid rgba(20,184,166,0.2)', borderRadius: 20 }}>
+                <Briefcase size={10} color="#14b8a6" />
+                <span style={{ fontSize: 10, color: '#14b8a6', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap' }}>
+                  {activeScenario ? (ROLE_LABELS[activeScenario.onetsoc_code] ?? 'Security Analyst') : 'Security Analyst'}
+                </span>
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
