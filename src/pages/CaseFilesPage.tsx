@@ -869,7 +869,7 @@ export default function CaseFilesPage() {
                 <User size={14} color="#fff" />
               </div>
               <div>
-                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>Analyst</p>
+                <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, margin: 0, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{activeScenario ? (ROLE_LABELS[activeScenario.onetsoc_code] ?? 'Security Analyst') : 'Security Analyst'}</p>
                 <p style={{ fontSize: 12, fontWeight: 900, color: '#14b8a6', margin: 0, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userName}</p>
               </div>
             </div>
@@ -878,8 +878,8 @@ export default function CaseFilesPage() {
       </header>
 
       {/* Step progress bar */}
-      <div style={{ background: '#0d0f18', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '10px 16px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center' }}>
+      <div style={{ background: 'rgba(20,184,166,0.04)', borderBottom: '1px solid rgba(20,184,166,0.12)', padding: '14px 24px' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto', display: 'flex', alignItems: 'center' }}>
           {([
             { n: 1, label: 'Read Brief',   tab: 'brief'       as const },
             { n: 2, label: 'Investigate',  tab: 'investigate' as const },
@@ -889,12 +889,12 @@ export default function CaseFilesPage() {
             const active = currentStep === n && phase !== 'result';
             return (
               <div key={n} style={{ display: 'contents' }}>
-                {i > 0 && <div style={{ flex: 1, height: 1, background: done ? 'rgba(34,197,94,0.5)' : 'rgba(255,255,255,0.08)', transition: 'background 0.4s' }} />}
-                <button onClick={() => { snd.click(); setTab(t); }} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 8, flexShrink: 0 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, border: done ? '2px solid #22c55e' : active ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.12)', background: done ? 'rgba(34,197,94,0.12)' : active ? 'rgba(20,184,166,0.12)' : 'transparent', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.2)', transition: 'all 0.3s', flexShrink: 0 }}>
+                {i > 0 && <div style={{ flex: 1, height: 2, background: done ? 'rgba(34,197,94,0.6)' : 'rgba(255,255,255,0.1)', transition: 'background 0.4s', margin: '0 4px' }} />}
+                <button onClick={() => { snd.click(); setTab(t); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, padding: '4px 10px', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 10, flexShrink: 0 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 900, border: done ? '2px solid #22c55e' : active ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.15)', background: done ? 'rgba(34,197,94,0.15)' : active ? 'rgba(20,184,166,0.18)' : 'rgba(255,255,255,0.03)', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', transition: 'all 0.3s', boxShadow: active ? '0 0 0 4px rgba(20,184,166,0.12)' : 'none', flexShrink: 0 }}>
                     {done ? '✓' : n}
                   </div>
-                  <span style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
+                  <span style={{ fontSize: 9, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: done ? '#22c55e' : active ? '#14b8a6' : 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap', transition: 'color 0.3s' }}>
                     {label}
                   </span>
                 </button>
