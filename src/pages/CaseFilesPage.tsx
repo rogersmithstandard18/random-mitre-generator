@@ -264,6 +264,7 @@ export default function CaseFilesPage() {
 
   // Drill state
   const [missionChecked, setMissionChecked] = useState<Set<number>>(new Set());
+  const [missionStepOrder, setMissionStepOrder] = useState<number[]>([]);
   const [evidenceReviewed, setEvidenceReviewed] = useState<Set<number>>(new Set());
   const [scopeSelections, setScopeSelections] = useState<Set<string>>(new Set());
   const [escalationSelections, setEscalationSelections] = useState<Set<string>>(new Set());
@@ -294,6 +295,7 @@ export default function CaseFilesPage() {
 
   const resetDrillState = useCallback(() => {
     setMissionChecked(new Set());
+    setMissionStepOrder([]);
     setEvidenceReviewed(new Set());
     setScopeSelections(new Set());
     setEscalationSelections(new Set());
@@ -535,12 +537,15 @@ export default function CaseFilesPage() {
           {activeScenario.mission_steps.map((step, i) => {
             const done = missionChecked.has(i);
             return (
-              <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) next.delete(i); else next.add(i); setMissionChecked(next); }}
-                style={{ padding: 16, borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.15s', border: done ? '1px solid rgba(22,163,74,0.3)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(22,163,74,0.08)' : '#151821' }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, border: done ? '2px solid #22c55e' : '2px solid rgba(255,255,255,0.15)', background: done ? '#22c55e' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.15s' }}>
+              <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) { next.delete(i); setMissionStepOrder(o => o.filter(x => x !== i)); } else { next.add(i); setMissionStepOrder(o => [...o, i]); } setMissionChecked(next); }}
+                style={{ padding: 16, borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.15s', border: done ? '1px solid rgba(20,184,166,0.35)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(20,184,166,0.07)' : '#151821' }}>
+                <div style={{ width: 20, height: 20, borderRadius: 6, border: done ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.15)', background: done ? '#14b8a6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.15s' }}>
                   {done && <CheckCircle2 size={12} color="#fff" />}
                 </div>
-                <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0, color: done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.75)', textDecoration: done ? 'line-through' : 'none', transition: 'all 0.15s' }}>{step}</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
+                <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0, color: done ? '#fff' : 'rgba(255,255,255,0.75)', transition: 'all 0.15s' }}>{step}</p>
+                {done && <span style={{ fontSize: 9, fontWeight: 900, color: '#14b8a6', textTransform: 'uppercase', letterSpacing: '0.12em' }}>✓ Logged to report</span>}
+              </div>
               </div>
             );
           })}
@@ -764,6 +769,27 @@ export default function CaseFilesPage() {
       ) : (
         /* ── Ticket form ── */
         <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Technical Findings Log */}
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Technical Findings Log</label>
+              <span style={{ fontSize: 9, color: missionStepOrder.length > 0 ? '#14b8a6' : 'rgba(255,255,255,0.2)', fontFamily: 'monospace', fontWeight: 700 }}>{missionStepOrder.length}/{missionTotal} logged</span>
+            </div>
+            <div style={{ background: 'rgba(0,0,0,0.35)', border: missionStepOrder.length > 0 ? '1px solid rgba(20,184,166,0.2)' : '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', minHeight: 60, display: 'flex', flexDirection: 'column', gap: 7, transition: 'border-color 0.3s' }}>
+              {missionStepOrder.length === 0 ? (
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', paddingTop: 8, textAlign: 'center' }}>Check off playbook steps to log findings here...</p>
+              ) : (
+                missionStepOrder.map((stepIdx, logIdx) => (
+                  <div key={stepIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ fontSize: 9, color: '#14b8a6', fontFamily: 'monospace', fontWeight: 900, flexShrink: 0, marginTop: 2, minWidth: 24 }}>[{String(logIdx + 1).padStart(2, '0')}]</span>
+                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.45, margin: 0 }}>{activeScenario.mission_steps[stepIdx]}</p>
+                  </div>
+                ))
+              )}
+            </div>
+            {missionStepOrder.length > 0 && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 5, marginBottom: 0 }}>Auto-logged from playbook. Add your analysis in the fields below.</p>}
+          </div>
+
           {/* Verdict */}
           <div>
             <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Incident Verdict</label>
