@@ -8,6 +8,9 @@ import CaseFilesPage from './pages/CaseFilesPage';
 import { SalesPage } from './pages/SalesPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
+import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { AccountPage } from './pages/AccountPage';
 import { UserMenu } from './components/auth/UserMenu';
 import { GoogleLoginButton } from './components/auth/GoogleLoginButton';
 import { useAuthStore } from './store/authStore';
@@ -66,6 +69,9 @@ function AppContent() {
             <Route path="/learn" element={<CardPage />} />
             <Route path="/scenarios" element={<ScenariosPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/account" element={<AccountPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
           </Routes>
         </div>
       )}

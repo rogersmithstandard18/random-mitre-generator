@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { LogOut, User, ChevronDown } from 'lucide-react';
+import { LogOut, User, ChevronDown, Settings } from 'lucide-react';
 
 export function UserMenu() {
   const { user, logout } = useAuthStore();
@@ -42,6 +43,14 @@ export function UserMenu() {
             <p className="user-menu-name">{user.name}</p>
             <p className="user-menu-email">{user.email}</p>
           </div>
+          <Link
+            to="/account"
+            className="user-menu-settings"
+            onClick={() => setIsOpen(false)}
+          >
+            <Settings size={16} />
+            Account Settings
+          </Link>
           <button
             className="user-menu-logout"
             onClick={() => {

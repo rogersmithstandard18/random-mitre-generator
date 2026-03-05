@@ -230,8 +230,8 @@ export const salesPageCopy = {
       company: [
         { label: "About", href: "#" },
         { label: "Contact", href: "#" },
-        { label: "Privacy Policy", href: "#" },
-        { label: "Terms of Service", href: "#" },
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
       ],
     },
     copyright: "© 2026 Cybersecurity Translator. All rights reserved.",
