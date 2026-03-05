@@ -265,6 +265,7 @@ export default function CaseFilesPage() {
   // Drill state
   const [missionChecked, setMissionChecked] = useState<Set<number>>(new Set());
   const [missionStepOrder, setMissionStepOrder] = useState<number[]>([]);
+  const [playbookTab, setPlaybookTab] = useState<'preparation' | 'analysis' | 'containment'>('analysis');
   const [evidenceReviewed, setEvidenceReviewed] = useState<Set<number>>(new Set());
   const [scopeSelections, setScopeSelections] = useState<Set<string>>(new Set());
   const [escalationSelections, setEscalationSelections] = useState<Set<string>>(new Set());
@@ -296,6 +297,7 @@ export default function CaseFilesPage() {
   const resetDrillState = useCallback(() => {
     setMissionChecked(new Set());
     setMissionStepOrder([]);
+    setPlaybookTab('analysis');
     setEvidenceReviewed(new Set());
     setScopeSelections(new Set());
     setEscalationSelections(new Set());
@@ -525,38 +527,60 @@ export default function CaseFilesPage() {
   /* ── Investigate Panel (center) ── */
   const InvestigatePanel = (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-      {/* Mission Steps */}
-      <section>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-          <h3 style={{ fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-            <Search size={12} color="#14b8a6" /> Mission Steps
+      {/* Incident Playbook */}
+      <section style={{ background: '#0f1117', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+        {/* Playbook header */}
+        <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', letterSpacing: '0.12em', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+            <FileText size={13} color="#14b8a6" /> Incident Playbook
           </h3>
-          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>{missionDone}/{missionTotal}</span>
+          <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', fontWeight: 700 }}>{missionDone} / {missionTotal} Tasks</span>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {activeScenario.mission_steps.map((step, i) => {
-            const done = missionChecked.has(i);
-            return (
-              <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) { next.delete(i); setMissionStepOrder(o => o.filter(x => x !== i)); } else { next.add(i); setMissionStepOrder(o => [...o, i]); } setMissionChecked(next); }}
-                style={{ padding: 16, borderRadius: 12, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.15s', border: done ? '1px solid rgba(20,184,166,0.35)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(20,184,166,0.07)' : '#151821' }}>
-                <div style={{ width: 20, height: 20, borderRadius: 6, border: done ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.15)', background: done ? '#14b8a6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.15s' }}>
-                  {done && <CheckCircle2 size={12} color="#fff" />}
+        {/* Tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          {(['preparation', 'analysis', 'containment'] as const).map(t => (
+            <button key={t} onClick={() => setPlaybookTab(t)}
+              style={{ flex: 1, padding: '10px 0', fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', border: 'none', background: 'none', cursor: 'pointer', color: playbookTab === t ? '#14b8a6' : 'rgba(255,255,255,0.25)', borderBottom: playbookTab === t ? '2px solid #14b8a6' : '2px solid transparent', transition: 'all 0.15s', marginBottom: -1 }}>
+              {t}
+            </button>
+          ))}
+        </div>
+        {/* Steps for active tab */}
+        <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {(() => {
+            const n = activeScenario.mission_steps.length;
+            const p1 = Math.ceil(n / 3);
+            const p2 = Math.ceil(n * 2 / 3);
+            const ranges: Record<string, [number, number]> = { preparation: [0, p1], analysis: [p1, p2], containment: [p2, n] };
+            const [start, end] = ranges[playbookTab];
+            return activeScenario.mission_steps.slice(start, end).map((step, relIdx) => {
+              const i = start + relIdx;
+              const done = missionChecked.has(i);
+              const parts = step.split(':');
+              const stepTitle = parts[0].trim();
+              const stepDesc = parts.slice(1).join(':').trim();
+              return (
+                <div key={i} onClick={() => { snd.step(); const next = new Set(missionChecked); if (done) { next.delete(i); setMissionStepOrder(o => o.filter(x => x !== i)); } else { next.add(i); setMissionStepOrder(o => [...o, i]); } setMissionChecked(next); }}
+                  style={{ padding: '12px 14px', borderRadius: 10, display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer', transition: 'all 0.18s', border: done ? '1px solid rgba(20,184,166,0.35)' : '1px solid rgba(255,255,255,0.05)', background: done ? 'rgba(20,184,166,0.08)' : 'rgba(255,255,255,0.02)' }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: done ? '2px solid #14b8a6' : '2px solid rgba(255,255,255,0.2)', background: done ? '#14b8a6' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1, transition: 'all 0.18s' }}>
+                    {done && <CheckCircle2 size={11} color="#fff" />}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.4, margin: 0, color: done ? '#14b8a6' : '#fff', transition: 'color 0.18s' }}>{stepTitle}</p>
+                    {stepDesc && <p style={{ fontSize: 12, lineHeight: 1.4, margin: '3px 0 0', color: 'rgba(255,255,255,0.4)' }}>{stepDesc}</p>}
+                  </div>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-                <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0, color: done ? '#fff' : 'rgba(255,255,255,0.75)', transition: 'all 0.15s' }}>{step}</p>
-                {done && <span style={{ fontSize: 9, fontWeight: 900, color: '#14b8a6', textTransform: 'uppercase', letterSpacing: '0.12em' }}>✓ Logged to report</span>}
-              </div>
-              </div>
-            );
-          })}
+              );
+            });
+          })()}
         </div>
       </section>
 
-      {/* Evidence Locker */}
+      {/* Logs to Investigate */}
       <section>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
           <h3 style={{ fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
-            <Briefcase size={12} color="#14b8a6" /> Evidence Locker
+            <Briefcase size={12} color="#14b8a6" /> Logs to Investigate
           </h3>
           <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace' }}>{evidenceReviewed.size}/{activeScenario.evidence_locker.length} reviewed</span>
         </div>
@@ -668,6 +692,15 @@ export default function CaseFilesPage() {
           )}
         </section>
       )}
+      {/* SME Insight */}
+      <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: 12, padding: '14px 16px' }}>
+        <p style={{ fontSize: 10, fontWeight: 900, color: '#a78bfa', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span style={{ fontFamily: 'monospace' }}>{'>'}_</span> SME Insight
+        </p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+          "{activeScenario.pause_prompt || 'Checking off steps in the playbook simulates the physical investigation. As you confirm data in the logs, mark it here to populate your final report.'}"
+        </p>
+      </div>
       {/* Next step CTA */}
       {phase !== 'result' && investigateStarted && (
         <button onClick={() => { snd.click(); setTab('ticket'); }}
@@ -685,8 +718,7 @@ export default function CaseFilesPage() {
       <div style={{ background: 'rgba(255,255,255,0.03)', padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: phase === 'result' ? '#14b8a6' : '#ef4444', animation: phase === 'result' ? undefined : 'cf-pulse 1.5s ease-in-out infinite' }} />
-          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Incident Ticket</span>
-          <span style={{ fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '0.1em', background: 'rgba(255,255,255,0.05)', padding: '2px 7px', borderRadius: 6 }}>Step 3</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Investigation Report</span>
         </div>
         <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: 4 }}>
           <Clock size={12} /> Case {activeScenario.scenario_number}
@@ -777,14 +809,17 @@ export default function CaseFilesPage() {
             </div>
             <div style={{ background: 'rgba(0,0,0,0.35)', border: missionStepOrder.length > 0 ? '1px solid rgba(20,184,166,0.2)' : '1px solid rgba(255,255,255,0.06)', borderRadius: 10, padding: '10px 12px', minHeight: 60, display: 'flex', flexDirection: 'column', gap: 7, transition: 'border-color 0.3s' }}>
               {missionStepOrder.length === 0 ? (
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', paddingTop: 8, textAlign: 'center' }}>Check off playbook steps to log findings here...</p>
+                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', margin: 0, fontStyle: 'italic', textAlign: 'center', padding: '6px 0' }}>No steps completed. Findings will appear here as you investigate...</p>
               ) : (
-                missionStepOrder.map((stepIdx, logIdx) => (
-                  <div key={stepIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: 9, color: '#14b8a6', fontFamily: 'monospace', fontWeight: 900, flexShrink: 0, marginTop: 2, minWidth: 24 }}>[{String(logIdx + 1).padStart(2, '0')}]</span>
-                    <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.65)', lineHeight: 1.45, margin: 0 }}>{activeScenario.mission_steps[stepIdx]}</p>
-                  </div>
-                ))
+                missionStepOrder.map((stepIdx) => {
+                  const stepTitle = activeScenario.mission_steps[stepIdx].split(':')[0].trim();
+                  return (
+                    <div key={stepIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                      <span style={{ color: '#14b8a6', fontSize: 13, flexShrink: 0, marginTop: 1 }}>•</span>
+                      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.45, margin: 0 }}>{stepTitle} — confirmed and documented.</p>
+                    </div>
+                  );
+                })
               )}
             </div>
             {missionStepOrder.length > 0 && <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', marginTop: 5, marginBottom: 0 }}>Auto-logged from playbook. Add your analysis in the fields below.</p>}
@@ -792,12 +827,12 @@ export default function CaseFilesPage() {
 
           {/* Verdict */}
           <div>
-            <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Incident Verdict</label>
+            <label style={{ display: 'block', fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Final Verdict</label>
             <div style={{ display: 'flex', gap: 8 }}>
-              {([['likely_real', '#ef4444'], ['likely_noise', '#22c55e'], ['unsure', '#f59e0b']] as const).map(([v, c]) => (
+              {([['likely_real', '#ef4444', 'True Positive'], ['likely_noise', '#22c55e', 'False Positive']] as const).map(([v, c, label]) => (
                 <button key={v} onClick={() => { snd.click(); setTicket(t => ({ ...t, real_or_noise: v })); }}
-                  style={{ flex: 1, padding: '10px 0', borderRadius: 8, fontSize: 10, fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.15s', border: ticket.real_or_noise === v ? `1.5px solid ${c}` : '1.5px solid rgba(255,255,255,0.08)', background: ticket.real_or_noise === v ? c : 'rgba(255,255,255,0.03)', color: ticket.real_or_noise === v ? '#fff' : 'rgba(255,255,255,0.4)' }}>
-                  {v.replace(/_/g, ' ')}
+                  style={{ flex: 1, padding: '11px 0', borderRadius: 8, fontSize: 10, fontWeight: 900, textTransform: 'uppercase', cursor: 'pointer', transition: 'all 0.15s', letterSpacing: '0.06em', border: ticket.real_or_noise === v ? `1.5px solid ${c}` : '1.5px solid rgba(255,255,255,0.1)', background: ticket.real_or_noise === v ? `${c}22` : 'rgba(255,255,255,0.03)', color: ticket.real_or_noise === v ? c : 'rgba(255,255,255,0.4)' }}>
+                  {label}
                 </button>
               ))}
             </div>
@@ -838,10 +873,13 @@ export default function CaseFilesPage() {
           {submitError && <p style={{ color: '#ef4444', fontSize: 12, margin: 0 }}>{submitError}</p>}
 
           <button onClick={handleSubmit} disabled={!canSubmit || submitting}
-            style={{ width: '100%', padding: 16, borderRadius: 12, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 14, cursor: canSubmit && !submitting ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'all 0.15s', border: 'none', background: canSubmit ? 'linear-gradient(135deg, #059669, #0d9488)' : 'rgba(255,255,255,0.03)', color: canSubmit ? '#fff' : 'rgba(255,255,255,0.2)' }}>
-            {submitting ? 'Submitting...' : 'Submit Investigation'}
-            {!submitting && <ArrowRight size={16} />}
+            style={{ width: '100%', padding: 18, borderRadius: 10, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.12em', fontSize: 13, cursor: canSubmit && !submitting ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s', border: canSubmit ? '1px solid rgba(20,184,166,0.4)' : '1px solid rgba(255,255,255,0.06)', background: canSubmit ? 'rgba(20,184,166,0.08)' : 'rgba(255,255,255,0.02)', color: canSubmit ? '#14b8a6' : 'rgba(255,255,255,0.15)' }}>
+            {submitting ? 'Submitting...' : 'Submit for Review'}
+            {!submitting && <ArrowRight size={15} />}
           </button>
+          <p style={{ textAlign: 'center', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: 'monospace', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+            Verification ID: {activeScenario.id.replace(/-/g, '').slice(0, 8).toUpperCase()}
+          </p>
           {!canSubmit && (
             <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', fontWeight: 700, margin: 0 }}>
               {!ticket.real_or_noise ? 'Select a verdict' : ticket.alert_summary.trim().length <= 10 ? 'Write a summary (10+ chars)' : 'Set severity & confidence'}
@@ -865,8 +903,8 @@ export default function CaseFilesPage() {
               <Shield size={20} color="#14b8a6" />
             </div>
             <div>
-              <h1 style={{ fontSize: 14, fontWeight: 900, color: '#fff', textTransform: 'uppercase', fontStyle: 'italic', letterSpacing: '-0.01em', margin: 0, lineHeight: 1 }}>Sentinel Investigation</h1>
-              <p style={{ fontSize: 9, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.12em', margin: 0 }}>Case File Workbook</p>
+              <h1 style={{ fontSize: 14, fontWeight: 900, color: '#fff', textTransform: 'uppercase', fontStyle: 'italic', letterSpacing: '-0.01em', margin: 0, lineHeight: 1 }}>Sentinel Ops</h1>
+              <p style={{ fontSize: 9, color: '#14b8a6', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.1em', margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}><Activity size={9} style={{ animation: 'cf-pulse 1.5s ease-in-out infinite' }} /> Status: Triage in Progress</p>
             </div>
             {/* Vertical divider */}
             <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.08)', marginLeft: 4 }} />
