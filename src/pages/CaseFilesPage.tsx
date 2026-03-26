@@ -1,12 +1,13 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Shield, User, Search, Briefcase, Info, FileText, Activity,
   CheckCircle2, Terminal, ArrowRight, Lock, Eye, Cpu, Globe,
-  Server, Clock, X, ChevronDown
+  Server, Clock, X, ChevronDown, Shuffle
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import type { CaseFileScenario, TicketDraft } from '@/types/CaseFile';
+import localCaseFileScenarios, { caseFileFilterMeta } from '@/constants/caseFileScenarios';
 
 /* ═══════════════════════════════════════════════════════════
    SOUNDS
@@ -259,6 +260,8 @@ export default function CaseFilesPage() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [activeScenario, setActiveScenario] = useState<CaseFileScenario | null>(null);
+  const [difficultyFilter, setDifficultyFilter] = useState<string | null>(null);
+  const [tacticFilter, setTacticFilter] = useState<string | null>(null);
   const [phase, setPhase] = useState<'loading' | 'investigate' | 'result'>('loading');
   const [tab, setTab] = useState<'brief' | 'investigate' | 'ticket'>('brief');
 
@@ -316,9 +319,33 @@ export default function CaseFilesPage() {
     setTimeout(() => snd.incoming(), 120);
   }, [resetDrillState, snd]);
 
-  // Fetch scenarios on mount
+  const filteredScenarios = useMemo(() => {
+    return scenarios.filter(s => {
+      if (difficultyFilter && s.level_label !== difficultyFilter) return false;
+      const meta = caseFileFilterMeta[s.id];
+      if (tacticFilter && meta && meta.tactic !== tacticFilter) return false;
+      return true;
+    });
+  }, [scenarios, difficultyFilter, tacticFilter]);
+
+  const handleRandom = useCallback(() => {
+    const pool = filteredScenarios.length > 0 ? filteredScenarios : scenarios;
+    if (!pool.length) return;
+    const others = pool.filter(s => s.id !== activeScenario?.id);
+    const pick = others.length ? others[Math.floor(Math.random() * others.length)] : pool[0];
+    snd.click();
+    selectScenario(pick);
+  }, [filteredScenarios, scenarios, activeScenario, snd, selectScenario]);
+
+  // Fetch scenarios on mount — merge local technique-based cases with any Supabase entries
   useEffect(() => {
-    if (!features.canAccessCaseFiles || !token) { setLoading(false); return; }
+    if (!features.canAccessCaseFiles) { setLoading(false); return; }
+    if (!token) {
+      setScenarios(localCaseFileScenarios);
+      if (localCaseFileScenarios.length) { setActiveScenario(localCaseFileScenarios[0]); setPhase('investigate'); }
+      setLoading(false);
+      return;
+    }
     fetch('/api/case-files/scenarios', { headers: { Authorization: `Bearer ${token}` } })
       .then(async (res) => {
         const data = await res.json();
@@ -326,11 +353,16 @@ export default function CaseFilesPage() {
         return data;
       })
       .then(data => {
-        const s = data.scenarios || [];
-        setScenarios(s);
-        if (s.length) { setActiveScenario(s[0]); setPhase('investigate'); }
+        const remote = data.scenarios || [];
+        const merged = [...localCaseFileScenarios, ...remote];
+        setScenarios(merged);
+        if (merged.length) { setActiveScenario(merged[0]); setPhase('investigate'); }
       })
-      .catch(err => setFetchError(err.message))
+      .catch(() => {
+        // Fall back to local scenarios on fetch error — no error screen needed
+        setScenarios(localCaseFileScenarios);
+        if (localCaseFileScenarios.length) { setActiveScenario(localCaseFileScenarios[0]); setPhase('investigate'); }
+      })
       .finally(() => setLoading(false));
   }, [features.canAccessCaseFiles, token]);
 
@@ -410,9 +442,10 @@ export default function CaseFilesPage() {
 
   const handleNext = () => {
     if (!activeScenario) return;
-    const next = scenarios.find(s => s.scenario_number > activeScenario.scenario_number);
+    const pool = filteredScenarios.length > 0 ? filteredScenarios : scenarios;
+    const next = pool.find(s => s.scenario_number > activeScenario.scenario_number);
     if (next) selectScenario(next);
-    else { selectScenario(scenarios[0]); } // loop back
+    else { selectScenario(pool[0]); } // loop back
   };
 
   const openEvidence = (item: { item: string; category: string }, idx: number) => {
@@ -485,8 +518,42 @@ export default function CaseFilesPage() {
       </div>
       {/* Scenario list */}
       <div style={{ background: '#0f1117', borderRadius: 12, border: '1px solid rgba(255,255,255,0.1)', padding: 16 }}>
-        <h3 style={{ fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: 12 }}>All Cases</h3>
-        {scenarios.map(s => {
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <h3 style={{ fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: 0 }}>
+            Cases ({filteredScenarios.length})
+          </h3>
+          <button onClick={handleRandom} title="Random case"
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 8, border: '1px solid rgba(20,184,166,0.3)', background: 'rgba(20,184,166,0.07)', color: '#14b8a6', fontSize: 10, fontWeight: 700, cursor: 'pointer', letterSpacing: '0.06em' }}>
+            <Shuffle size={10} /> Random
+          </button>
+        </div>
+        {/* Difficulty filter chips */}
+        <div style={{ display: 'flex', gap: 5, marginBottom: 8, flexWrap: 'wrap' }}>
+          {([['Beginner', 1], ['Intermediate', 2], ['Advanced', 3]] as [string, number][]).map(([label, lvl]) => {
+            const c = LEVEL_COLORS[lvl];
+            const active = difficultyFilter === label;
+            return (
+              <button key={label} onClick={() => setDifficultyFilter(active ? null : label)}
+                style={{ padding: '3px 9px', borderRadius: 20, border: `1px solid ${active ? c.border : 'rgba(255,255,255,0.1)'}`, cursor: 'pointer', fontSize: 10, fontWeight: 700, background: active ? c.bg : 'transparent', color: active ? c.text : 'rgba(255,255,255,0.35)', transition: 'all 0.15s' }}>
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        {/* Tactic filter dropdown */}
+        <select value={tacticFilter ?? ''} onChange={e => setTacticFilter(e.target.value || null)}
+          style={{ width: '100%', padding: '5px 8px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: '#0a0c10', color: tacticFilter ? '#14b8a6' : 'rgba(255,255,255,0.35)', fontSize: 11, cursor: 'pointer', marginBottom: 10, outline: 'none' }}>
+          <option value="">All Tactics</option>
+          {(['Reconnaissance','Resource Development','Initial Access','Execution','Persistence','Privilege Escalation','Defense Evasion','Credential Access','Discovery','Lateral Movement','Collection','Command and Control','Exfiltration','Impact'] as const).map(t => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        {/* Case list */}
+        {filteredScenarios.length === 0 && (
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '12px 0' }}>No cases match filters</p>
+        )}
+        {filteredScenarios.map(s => {
           const sc = levelColor(s.level);
           const active = activeScenario.id === s.id;
           return (
