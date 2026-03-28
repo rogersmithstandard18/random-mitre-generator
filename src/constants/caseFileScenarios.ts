@@ -1,6 +1,7 @@
 import techniques from './techniques';
 import type { CaseFileScenario } from '@/types/CaseFile';
 import type { Difficulty, LearningPath, MitreTactic } from '@/types/TranslationCard';
+import { mapTechniqueToThreatType } from './gameData';
 
 // Metadata used for filtering — keyed by case file id (e.g. "cf-T1566")
 export interface CaseFileFilterMeta {
@@ -61,6 +62,7 @@ const localCaseFileScenarios: CaseFileScenario[] = techniques.map((t, idx) => {
     pause_prompt: t.reflectionQuestion,
     is_active: true,
     is_pro_only: false,
+    threat_type: mapTechniqueToThreatType(t.tactic),
   };
 });
 

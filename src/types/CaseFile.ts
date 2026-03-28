@@ -53,6 +53,7 @@ export interface CaseFileScenario {
   pause_prompt: string | null;
   is_active: boolean;
   is_pro_only: boolean;
+  threat_type?: 'phishing' | 'ransomware' | 'apt';
 }
 
 export interface TicketDraft {
