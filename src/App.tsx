@@ -10,6 +10,7 @@ import { SalesPage } from './pages/SalesPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
 import { TermsPage } from './pages/TermsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 import { UserMenu } from './components/auth/UserMenu';
 import { GoogleLoginButton } from './components/auth/GoogleLoginButton';
 import { useAuthStore } from './store/authStore';
@@ -20,6 +21,7 @@ function AppContent() {
   const isDemoPage = location.pathname === '/demo';
   const isCaseFilesPage = location.pathname === '/case-files';
   const isTermsPage = location.pathname === '/terms';
+  const isPrivacyPage = location.pathname === '/privacy';
   const isPaymentPage = location.pathname.startsWith('/payment');
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
@@ -66,6 +68,10 @@ function AppContent() {
       ) : isTermsPage ? (
         <Routes>
           <Route path="/terms" element={<TermsPage />} />
+        </Routes>
+      ) : isPrivacyPage ? (
+        <Routes>
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Routes>
       ) : isPaymentPage ? (
         <div className="page">
