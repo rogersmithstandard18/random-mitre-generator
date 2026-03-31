@@ -78,21 +78,21 @@ export const salesPageCopy = {
       {
         quote:
           "This tool transformed how I study for security certifications. The plain-language explanations make MITRE ATT&CK actually approachable.",
-        
+        author: "This app is for:",
         role: "Security Analyst",
         company: "Tech Startup",
       },
       {
         quote:
           "Finally, a way to explain technical risks to our board. The boardroom pitches are worth the subscription alone.",
-        author: "Job Title",
+        author: "This app is for:",
         role: "CISO",
         company: "Healthcare Provider",
       },
       {
         quote:
           "The learning paths feature helped our team focus on what matters. Blue team learns defense, red team learns offense.",
-        author: "Job Title",
+        author: "This app is for:",
         role: "Security Manager",
         company: "Enterprise SaaS Sales",
       },
