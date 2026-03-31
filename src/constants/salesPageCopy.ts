@@ -78,7 +78,7 @@ export const salesPageCopy = {
       {
         quote:
           "This tool transformed how I study for security certifications. The plain-language explanations make MITRE ATT&CK actually approachable.",
-        author: "Job Title",
+        
         role: "Security Analyst",
         company: "Tech Startup",
       },
