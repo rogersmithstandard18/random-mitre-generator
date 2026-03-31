@@ -73,7 +73,7 @@ export const salesPageCopy = {
   },
 
   testimonials: {
-    headline: "Trusted by Security Professionals",
+    headline: "Created for Security Professionals",
     items: [
       {
         quote:
