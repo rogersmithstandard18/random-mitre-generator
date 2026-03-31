@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Shield } from 'lucide-react';
 import CardPage from './pages/CardPage';
+import DemoPage from './pages/DemoPage';
 import HistoryPage from './pages/HistoryPage';
 import ScenariosPage from './pages/ScenariosPage';
 import CaseFilesPage from './pages/CaseFilesPage';
@@ -15,6 +16,7 @@ import { useAuthStore } from './store/authStore';
 function AppContent() {
   const location = useLocation();
   const isSalesPage = location.pathname === '/';
+  const isDemoPage = location.pathname === '/demo';
   const isCaseFilesPage = location.pathname === '/case-files';
   const isPaymentPage = location.pathname.startsWith('/payment');
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
@@ -49,6 +51,12 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<SalesPage />} />
         </Routes>
+      ) : isDemoPage ? (
+        <div className="page">
+          <Routes>
+            <Route path="/demo" element={<DemoPage />} />
+          </Routes>
+        </div>
       ) : isCaseFilesPage ? (
         <Routes>
           <Route path="/case-files" element={<CaseFilesPage />} />

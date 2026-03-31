@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { ChevronDown, Star, Eye, EyeOff } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ChevronDown, Star, Eye, EyeOff, Lock } from 'lucide-react';
 import { TranslationCard } from '@/types/TranslationCard';
 import { useTopicStore } from '@/store/topicStore';
 import { difficultyConfigs, learningPathConfigs } from '@/constants/learningPaths';
 
 interface Props {
   card: TranslationCard;
+  demoMode?: boolean;
 }
 
 function Section({ title, defaultOpen = false, children }: { title: string; defaultOpen?: boolean; children: React.ReactNode }) {
@@ -21,12 +23,15 @@ function Section({ title, defaultOpen = false, children }: { title: string; defa
   );
 }
 
-export default function TranslationCardView({ card }: Props) {
-  const favorites = useTopicStore(s => s.favorites);
+export default function TranslationCardView({ card, demoMode }: Props) {
+  const navigate = useNavigate();
+  const storeFavorites = useTopicStore(s => s.favorites);
   const toggleFavorite = useTopicStore(s => s.toggleFavorite);
-  const showAdvanced = useTopicStore(s => s.showAdvanced);
+  const storeShowAdvanced = useTopicStore(s => s.showAdvanced);
   const toggleAdvanced = useTopicStore(s => s.toggleAdvanced);
 
+  const favorites = demoMode ? [] : storeFavorites;
+  const showAdvanced = demoMode ? false : storeShowAdvanced;
   const isFav = favorites.includes(card.techniqueId);
   const diffColor = difficultyConfigs.find(d => d.level === card.difficulty)?.color || '#999';
 
@@ -40,13 +45,15 @@ export default function TranslationCardView({ card }: Props) {
         <span className="difficulty-badge" style={{ background: diffColor }}>
           {card.difficulty}
         </span>
-        <button
-          className={`favorite-btn ${isFav ? 'active' : ''}`}
-          onClick={() => toggleFavorite(card.techniqueId)}
-          title={isFav ? 'Remove from favorites' : 'Add to favorites'}
-        >
-          <Star size={20} fill={isFav ? '#FF5252' : 'none'} />
-        </button>
+        {!demoMode && (
+          <button
+            className={`favorite-btn ${isFav ? 'active' : ''}`}
+            onClick={() => toggleFavorite(card.techniqueId)}
+            title={isFav ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Star size={20} fill={isFav ? '#FF5252' : 'none'} />
+          </button>
+        )}
       </div>
 
       <h2 className="card-title">{card.techniqueName}</h2>
@@ -85,24 +92,33 @@ export default function TranslationCardView({ card }: Props) {
         ))}
       </Section>
 
-      <button className="advanced-toggle" onClick={toggleAdvanced}>
-        {showAdvanced ? <EyeOff size={16} /> : <Eye size={16} />}
-        {showAdvanced ? 'Hide' : 'Show'} Detection & Mitigation
-      </button>
-
-      {showAdvanced && (
+      {demoMode ? (
+        <button className="advanced-toggle demo-locked" onClick={() => navigate('/')}>
+          <Lock size={16} />
+          Sign up to unlock Detection & Mitigation
+        </button>
+      ) : (
         <>
-          <Section title="Detection Hints" defaultOpen>
-            <ul className="hint-list">
-              {card.detectionHints.map((h, i) => <li key={i}>{h}</li>)}
-            </ul>
-          </Section>
+          <button className="advanced-toggle" onClick={toggleAdvanced}>
+            {showAdvanced ? <EyeOff size={16} /> : <Eye size={16} />}
+            {showAdvanced ? 'Hide' : 'Show'} Detection & Mitigation
+          </button>
 
-          <Section title="Mitigations" defaultOpen>
-            <ul className="mitigation-list">
-              {card.mitigations.map((m, i) => <li key={i}>{m}</li>)}
-            </ul>
-          </Section>
+          {showAdvanced && (
+            <>
+              <Section title="Detection Hints" defaultOpen>
+                <ul className="hint-list">
+                  {card.detectionHints.map((h, i) => <li key={i}>{h}</li>)}
+                </ul>
+              </Section>
+
+              <Section title="Mitigations" defaultOpen>
+                <ul className="mitigation-list">
+                  {card.mitigations.map((m, i) => <li key={i}>{m}</li>)}
+                </ul>
+              </Section>
+            </>
+          )}
         </>
       )}
 
