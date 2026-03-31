@@ -10,7 +10,7 @@ export function TermsPage() {
         <section>
           <h2>1. Acceptance of Terms</h2>
           <p>
-            By accessing or using the CyberSecurity Learner platform ("Service"), operated by [Company Name] ("we," "us," or "our"),
+            By accessing or using the CyberSecurity Learner platform ("Service"), operated by [FunEvents LLC] ("we," "us," or "our"),
             you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use the Service.
           </p>
           <p>
@@ -72,7 +72,7 @@ export function TermsPage() {
           <h2>5. Intellectual Property</h2>
           <p>
             All content, features, and functionality of the Service — including but not limited to text, graphics, logos, icons,
-            software, and educational materials — are owned by [Company Name] and are protected by copyright, trademark, and other
+            software, and educational materials — are owned by [FunEvents LLC] and are protected by copyright, trademark, and other
             intellectual property laws.
           </p>
           <p>
@@ -112,7 +112,7 @@ export function TermsPage() {
         <section>
           <h2>8. Limitation of Liability</h2>
           <p>
-            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, [COMPANY NAME] AND ITS OFFICERS, DIRECTORS, EMPLOYEES,
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, [FunEvents LLC] AND ITS OFFICERS, DIRECTORS, EMPLOYEES,
             AND AGENTS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES,
             INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL, ARISING OUT OF OR IN CONNECTION WITH
             YOUR USE OF THE SERVICE.
@@ -126,7 +126,7 @@ export function TermsPage() {
         <section>
           <h2>9. Indemnification</h2>
           <p>
-            You agree to indemnify, defend, and hold harmless [Company Name] and its officers, directors, employees, and agents
+            You agree to indemnify, defend, and hold harmless [FunEvents LLC] and its officers, directors, employees, and agents
             from and against any claims, liabilities, damages, losses, or expenses (including reasonable attorneys' fees) arising
             out of or in connection with your use of the Service or violation of these Terms.
           </p>
