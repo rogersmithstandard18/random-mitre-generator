@@ -217,7 +217,7 @@ export const salesPageCopy = {
       product: [
         { label: "Features", href: "#features" },
         { label: "Pricing", href: "#pricing" },
-        { label: "Demo", href: "/learn" },
+        { label: "Demo", href: "/demo" },
       ],
       resources: [
         { label: "MITRE ATT&CK", href: "https://attack.mitre.org/", external: true },
