@@ -1204,6 +1204,13 @@ a {
   margin-bottom: 12px;
 }
 
+.legal-page-content h3 {
+  font-size: 16px;
+  color: #e0e0e0;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
 .legal-page-content p {
   margin-bottom: 12px;
   color: #ccc;
