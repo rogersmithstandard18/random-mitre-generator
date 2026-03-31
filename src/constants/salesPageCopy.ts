@@ -61,12 +61,7 @@ export const salesPageCopy = {
           "Structured paths for Blue Team, Red Team, Purple Team, and GRC professionals.",
         icon: "Route",
       },
-      {
-        title: "SOC Scenarios",
-        description:
-          "Interactive choose-your-own-path incident response scenarios with real-world SOC decision-making.",
-        icon: "Crosshair",
-      },
+    
     ],
   },
 
@@ -83,23 +78,23 @@ export const salesPageCopy = {
       {
         quote:
           "This tool transformed how I study for security certifications. The plain-language explanations make MITRE ATT&CK actually approachable.",
-        author: "Sarah",
+        author: "Unknown",
         role: "Security Analyst",
         company: "Tech Startup",
       },
       {
         quote:
           "Finally, a way to explain technical risks to our board. The boardroom pitches are worth the subscription alone.",
-        author: "Michael",
+        author: "Unknown",
         role: "CISO",
         company: "Healthcare Provider",
       },
       {
         quote:
           "The learning paths feature helped our team focus on what matters. Blue team learns defense, red team learns offense.",
-        author: "Jennifer",
+        author: "unknown",
         role: "Security Manager",
-        company: "Enterprise SaaS",
+        company: "Enterprise SaaS Sales",
       },
     ],
   },
@@ -148,6 +143,7 @@ export const salesPageCopy = {
           "Blue Team / Red Team / Purple Team paths",
           "Scenario filters (Security+, OWASP)",
           "Scenario progress tracking",
+          "Case File Games", //todo collaboration feature update
           "Priority support",
         ],
         cta: "Go Professional",
@@ -164,6 +160,7 @@ export const salesPageCopy = {
           "Team collaboration features",
           "Custom learning paths",
           "API access",
+          "Case File Games", //todo collaboration feature update
           "Dedicated support",
         ],
         cta: "Request Quote",
@@ -200,7 +197,7 @@ export const salesPageCopy = {
       {
         question: "What payment methods do you accept?",
         answer:
-          "We accept all major credit cards and PayPal. Enterprise customers can pay via invoice.",
+          "We accept all major credit cards and PayPal. Enterprise customers can pay via invoice with escrow or contract.",
       },
       {
         question: "Can I cancel anytime?",
