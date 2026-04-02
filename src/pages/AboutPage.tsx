@@ -50,8 +50,8 @@ export function AboutPage() {
             sides of the cybersecurity education challenge.
           </p>
           <p>
-            I spent 10 years working at Arizona State University's University Technology Office — that's
-            over 20,000 hours in IT, solving real problems across a major research institution. I hold a
+            I spent 10 years working at Arizona State University's University Technology Office 
+            solving real problems across a major research institution. I hold a
             Bachelor of Science in Information Technology from ASU's Ira A. Fulton Schools of Engineering,
             and that foundation has shaped everything I do.
           </p>
@@ -59,14 +59,14 @@ export function AboutPage() {
             For the past 4 years, I've been instructing IT security at a vocational school, teaching adults
             who are changing careers or leveling up their skills. Now I'm transitioning into secondary
             education, bringing IT security instruction to high school students through both one-year and
-            two-year cohort programs. I recently earned my CTE certification in standardized specialized
+            two-year cohort programs. I have a CTE certification in standardized specialized
             CTE industry and emerging technology, which reflects my commitment to meeting students where
             they are — whether they're career changers or just getting started.
           </p>
           <p>
             I built this app because I kept seeing the same problem in my classrooms and in the industry:
             people struggling to connect abstract framework concepts to real-world meaning. CyberSecurity
-            Learner is my answer to that — a tool that makes MITRE ATT&CK genuinely accessible.
+            Learner is my answer to that, a tool that makes MITRE ATT&CK genuinely accessible.
           </p>
           <p>
             This app was vibe engineered — built with AI-assisted development and a whole lot of domain
