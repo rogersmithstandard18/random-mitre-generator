@@ -225,7 +225,7 @@ export const salesPageCopy = {
         { label: "Documentation", href: "#" },
       ],
       company: [
-        { label: "About", href: "#" },
+        { label: "About", href: "/about" },
         { label: "Contact", href: "#" },
         { label: "Privacy Policy", href: "/privacy" },
         { label: "Terms of Service", href: "/terms" },
