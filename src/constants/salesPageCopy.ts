@@ -107,8 +107,9 @@ export const salesPageCopy = {
         name: "Free",
         price: 0,
         period: "month" as const,
-        description: "Get started with random learning",
+        description: "Get started with real investigations",
         features: [
+          "1 weekly Case File investigation",
           "Random technique cards",
           "Plain language explanations",
           "Boardroom translations",

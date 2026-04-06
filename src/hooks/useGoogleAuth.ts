@@ -98,9 +98,17 @@ export function useGoogleAuth() {
         await syncLocalDataToBackend(data.token);
       }
 
-      if (redirectPath) {
-        console.log('Login successful, navigating to:', redirectPath);
-        navigate(redirectPath);
+      // Detect first-time free user and redirect to case files for the "aha moment"
+      const isFirstLogin = !data.savedData ||
+        ((!data.savedData.cardHistory || data.savedData.cardHistory.length === 0) &&
+         (!data.savedData.scenarioProgress || data.savedData.scenarioProgress.length === 0));
+      const destination = (isFirstLogin && data.user.tier === 'free')
+        ? '/case-files'
+        : redirectPath;
+
+      if (destination) {
+        console.log('Login successful, navigating to:', destination);
+        navigate(destination);
       } else {
         console.log('Login successful, staying on current page');
       }

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Info } from 'lucide-react';
+import { Shield, Lock, Info, Clock, ArrowRight, Zap } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import type { CaseFileScenario } from '@/types/CaseFile';
 import localCaseFileScenarios, { caseFileFilterMeta } from '@/constants/caseFileScenarios';
 import { useGameEngine } from '@/hooks/useGameEngine';
+import { getWeeklyCaseFileId, getNextWeekReset, WEEKLY_CASE_FILE_IDS } from '@/constants/weeklyCaseFiles';
 
 // Game components
 import GameHeader from '@/components/game/GameHeader';
@@ -101,19 +102,197 @@ function LoadingScreen() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   COUNTDOWN HOOK
+═══════════════════════════════════════════════════════════ */
+function useCountdown(targetDate: Date) {
+  const [timeLeft, setTimeLeft] = useState('');
+  useEffect(() => {
+    const tick = () => {
+      const diff = targetDate.getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft('Available now!'); return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      setTimeLeft(d > 0 ? `${d}d ${h}h ${m}m` : `${h}h ${m}m`);
+    };
+    tick();
+    const id = setInterval(tick, 60000);
+    return () => clearInterval(id);
+  }, [targetDate]);
+  return timeLeft;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WEEKLY CASE FILE SCREEN (FREE TIER)
+═══════════════════════════════════════════════════════════ */
+function WeeklyCaseFileScreen({ onStartGame }: { onStartGame: () => void }) {
+  const token = useAuthStore(s => s.token);
+  const [weeklyData, setWeeklyData] = useState<{ alreadyUsed: boolean; nextResetAt: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const weeklyCaseFileId = getWeeklyCaseFileId();
+  const weeklyScenario = localCaseFileScenarios.find(s => s.id === weeklyCaseFileId);
+  const nextReset = useMemo(() => getNextWeekReset(), []);
+  const countdown = useCountdown(nextReset);
+
+  // Get upcoming weeks' scenarios for teaser
+  const upcomingScenarios = useMemo(() => {
+    const now = new Date();
+    const upcoming: CaseFileScenario[] = [];
+    for (let i = 1; i <= 3; i++) {
+      const futureDate = new Date(now.getTime() + i * 7 * 86400000);
+      const futureId = getWeeklyCaseFileId(futureDate);
+      const scenario = localCaseFileScenarios.find(s => s.id === futureId);
+      if (scenario) upcoming.push(scenario);
+    }
+    return upcoming;
+  }, []);
+
+  useEffect(() => {
+    if (!token) { setLoading(false); return; }
+    fetch('/api/case-files/weekly', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then(data => setWeeklyData(data))
+      .catch(() => setWeeklyData(null))
+      .finally(() => setLoading(false));
+  }, [token]);
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0a0c10', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#14b8a6', animation: 'cf-pulse 1.5s ease-in-out infinite' }} />
+      </div>
+    );
+  }
+
+  const alreadyUsed = weeklyData?.alreadyUsed ?? false;
+
+  return (
+    <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0a0c10', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, gap: 32 }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 64, height: 64, borderRadius: 16, background: alreadyUsed ? 'rgba(34,197,94,0.1)' : 'rgba(20,184,166,0.1)', border: `1px solid ${alreadyUsed ? 'rgba(34,197,94,0.3)' : 'rgba(20,184,166,0.3)'}`, marginBottom: 16 }}>
+          {alreadyUsed ? <Shield size={32} color="#22c55e" /> : <Shield size={32} color="#14b8a6" />}
+        </div>
+        <h1 style={{ fontSize: 24, fontWeight: 900, color: '#fff', marginBottom: 4 }}>
+          {alreadyUsed ? 'Case Completed' : 'Weekly Case File'}
+        </h1>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, margin: 0 }}>
+          {alreadyUsed ? 'Great work, analyst.' : 'Your weekly investigation is ready.'}
+        </p>
+      </div>
+
+      {/* Case File Card */}
+      {weeklyScenario && (
+        <div style={{
+          maxWidth: 460, width: '100%', background: '#0f1117', borderRadius: 16,
+          border: `1px solid ${alreadyUsed ? 'rgba(34,197,94,0.2)' : 'rgba(20,184,166,0.2)'}`,
+          overflow: 'hidden',
+        }}>
+          {/* Card header bar */}
+          <div style={{ padding: '12px 20px', background: alreadyUsed ? 'rgba(34,197,94,0.05)' : 'rgba(20,184,166,0.05)', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 9, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#14b8a6' }}>
+                {weeklyScenario.subtitle}
+              </span>
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', padding: '3px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.05)' }}>
+              {weeklyScenario.level_label}
+            </span>
+          </div>
+
+          {/* Card body */}
+          <div style={{ padding: 20 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 900, color: '#fff', marginBottom: 8 }}>
+              {weeklyScenario.title}
+            </h2>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: 20, fontStyle: 'italic' }}>
+              "{weeklyScenario.scenario_text}"
+            </p>
+
+            {alreadyUsed ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+                <Clock size={14} />
+                <span>Next case in <strong style={{ color: '#14b8a6' }}>{countdown}</strong></span>
+              </div>
+            ) : (
+              <button onClick={onStartGame} style={{
+                width: '100%', padding: '14px 24px', borderRadius: 10, fontWeight: 900,
+                textTransform: 'uppercase', letterSpacing: '0.06em', fontSize: 14,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                border: 'none', cursor: 'pointer',
+                background: 'linear-gradient(135deg, #0891b2, #2563eb)', color: '#fff',
+              }}>
+                Start Investigation <ArrowRight size={16} />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Upgrade CTA */}
+      <div style={{ maxWidth: 460, width: '100%', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)', padding: 20, textAlign: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+          <Zap size={14} color="#f59e0b" />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Want unlimited case files?</span>
+        </div>
+        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 16, lineHeight: 1.5 }}>
+          Professional plan gives you unlimited investigations, AI-powered debriefs, scenario filters, and progress tracking.
+        </p>
+        <Link to="/#pricing" style={{ display: 'inline-block', padding: '10px 24px', background: 'rgba(255,255,255,0.06)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 13, border: '1px solid rgba(255,255,255,0.1)' }}>
+          View Plans
+        </Link>
+      </div>
+
+      {/* Upcoming cases teaser */}
+      {upcomingScenarios.length > 0 && (
+        <div style={{ maxWidth: 460, width: '100%' }}>
+          <h3 style={{ fontSize: 10, fontWeight: 900, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>
+            Coming Up
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {upcomingScenarios.map((s, i) => (
+              <div key={s.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: '#0f1117', borderRadius: 8, border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <Lock size={12} color="rgba(255,255,255,0.15)" />
+                  <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{s.title}</span>
+                </div>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>Week {i + 1}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    MAIN PAGE
 ═══════════════════════════════════════════════════════════ */
 export default function CaseFilesPage() {
   const snd = useSounds();
   const token = useAuthStore(s => s.token);
   const features = useAuthStore(s => s.getTierFeatures());
+  const userTier = useAuthStore(s => s.getUserTier());
 
   const [scenarios, setScenarios] = useState<CaseFileScenario[]>([]);
   const [loading, setLoading] = useState(true);
-  const [gameKey, setGameKey] = useState(0); // Increment to restart game
+  const [gameKey, setGameKey] = useState(0);
+  const [weeklyGameStarted, setWeeklyGameStarted] = useState(false);
+
+  const isFreeTier = !features.canAccessCaseFiles && features.canAccessWeeklyCaseFile;
 
   // Fetch scenarios on mount
   useEffect(() => {
+    // For free-tier weekly case: use the single weekly scenario from local data
+    if (isFreeTier) {
+      const weeklyCaseFileId = getWeeklyCaseFileId();
+      const weeklyScenario = localCaseFileScenarios.find(s => s.id === weeklyCaseFileId);
+      if (weeklyScenario) setScenarios([weeklyScenario]);
+      setLoading(false);
+      return;
+    }
     if (!features.canAccessCaseFiles) { setLoading(false); return; }
     if (!token) {
       setScenarios(localCaseFileScenarios);
@@ -134,10 +313,10 @@ export default function CaseFilesPage() {
         setScenarios(localCaseFileScenarios);
       })
       .finally(() => setLoading(false));
-  }, [features.canAccessCaseFiles, token]);
+  }, [features.canAccessCaseFiles, isFreeTier, token]);
 
-  // Tier gate
-  if (!features.canAccessCaseFiles) {
+  // Not authenticated and no weekly access — full lock
+  if (!features.canAccessCaseFiles && !features.canAccessWeeklyCaseFile) {
     return (
       <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0a0c10', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
         <div style={{ textAlign: 'center', maxWidth: 400 }}>
@@ -156,6 +335,18 @@ export default function CaseFilesPage() {
     );
   }
 
+  // Free tier: show weekly case file screen or the game
+  if (isFreeTier && !weeklyGameStarted) {
+    return (
+      <>
+        <WeeklyCaseFileScreen onStartGame={() => setWeeklyGameStarted(true)} />
+        <style>{`
+          @keyframes cf-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        `}</style>
+      </>
+    );
+  }
+
   if (loading) return <LoadingScreen />;
   if (scenarios.length === 0) return (
     <div style={{ minHeight: 'calc(100vh - 56px)', background: '#0a0c10', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)' }}>
@@ -165,7 +356,15 @@ export default function CaseFilesPage() {
 
   return (
     <>
-      <GameSession key={gameKey} scenarios={scenarios} snd={snd} token={token} onRestart={() => setGameKey(k => k + 1)} />
+      <GameSession key={gameKey} scenarios={scenarios} snd={snd} token={token} onRestart={() => {
+        if (isFreeTier) {
+          // Free users go back to weekly screen after game ends
+          setWeeklyGameStarted(false);
+          setGameKey(k => k + 1);
+        } else {
+          setGameKey(k => k + 1);
+        }
+      }} isWeeklyFree={isFreeTier} />
       <style>{`
         @keyframes cf-fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes cf-slideUp { from { transform: translateY(18px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -184,12 +383,13 @@ export default function CaseFilesPage() {
    GAME SESSION — isolated so key reset works
 ═══════════════════════════════════════════════════════════ */
 function GameSession({
-  scenarios, snd, token, onRestart,
+  scenarios, snd, token, onRestart, isWeeklyFree = false,
 }: {
   scenarios: CaseFileScenario[];
   snd: ReturnType<typeof useSounds>;
   token: string | null;
   onRestart: () => void;
+  isWeeklyFree?: boolean;
 }) {
   const { state, dispatch, actions } = useGameEngine(scenarios);
   const [mobileTab, setMobileTab] = useState<'action' | 'status' | 'verdict'>('action');
@@ -270,7 +470,7 @@ function GameSession({
     return (
       <div style={{ background: '#0a0c10', minHeight: 'calc(100vh - 56px)' }}>
         <GameHeader state={state} />
-        <GameOverScreen state={state} isGameOver={state.phase === 'gameover'} onPlayAgain={onRestart} />
+        <GameOverScreen state={state} isGameOver={state.phase === 'gameover'} onPlayAgain={onRestart} isWeeklyFree={isWeeklyFree} />
       </div>
     );
   }

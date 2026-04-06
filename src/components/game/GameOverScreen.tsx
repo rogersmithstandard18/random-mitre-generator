@@ -1,4 +1,5 @@
-import { ArrowRight, Shield, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowRight, Shield, XCircle, Zap } from 'lucide-react';
 import type { GameState, Grade } from '@/types/GameState';
 import { THREAT_TYPES } from '@/constants/gameData';
 
@@ -13,9 +14,10 @@ interface Props {
   state: GameState;
   isGameOver: boolean; // true = HP hit 0, false = completed all rounds
   onPlayAgain: () => void;
+  isWeeklyFree?: boolean;
 }
 
-export default function GameOverScreen({ state, isGameOver, onPlayAgain }: Props) {
+export default function GameOverScreen({ state, isGameOver, onPlayAgain, isWeeklyFree = false }: Props) {
   const score = state.score;
   const grade = score?.grade ?? 'COMPROMISED';
   const gs = GRADE_STYLES[grade];
@@ -109,14 +111,31 @@ export default function GameOverScreen({ state, isGameOver, onPlayAgain }: Props
         </div>
       )}
 
+      {/* Upgrade prompt for free users */}
+      {isWeeklyFree && (
+        <div style={{ maxWidth: 480, width: '100%', background: 'linear-gradient(135deg, rgba(8,145,178,0.08), rgba(37,99,235,0.08))', borderRadius: 12, border: '1px solid rgba(20,184,166,0.2)', padding: 20, textAlign: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+            <Zap size={14} color="#f59e0b" />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>You just completed a real SOC investigation.</span>
+          </div>
+          <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 16, lineHeight: 1.5 }}>
+            Get unlimited case files, AI-powered debriefs, and progress tracking with Professional.
+          </p>
+          <Link to="/#pricing" style={{ display: 'inline-block', padding: '10px 28px', background: 'linear-gradient(135deg, #0891b2, #2563eb)', color: '#fff', borderRadius: 8, textDecoration: 'none', fontWeight: 700, fontSize: 13 }}>
+            Unlock Unlimited Access
+          </Link>
+        </div>
+      )}
+
       <button onClick={onPlayAgain}
         style={{
           padding: '16px 48px', borderRadius: 12, fontWeight: 900, textTransform: 'uppercase',
           letterSpacing: '0.08em', fontSize: 14, display: 'flex', alignItems: 'center', gap: 8,
           border: 'none', cursor: 'pointer',
-          background: 'linear-gradient(135deg, #0891b2, #2563eb)', color: '#fff',
+          background: isWeeklyFree ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #0891b2, #2563eb)', color: '#fff',
+          ...(isWeeklyFree ? { border: '1px solid rgba(255,255,255,0.1)' } : {}),
         }}>
-        Play Again <ArrowRight size={16} />
+        {isWeeklyFree ? 'Back to Case Files' : 'Play Again'} <ArrowRight size={16} />
       </button>
     </div>
   );

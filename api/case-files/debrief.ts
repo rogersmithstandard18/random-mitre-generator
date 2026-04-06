@@ -1,6 +1,25 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { verifyAuth } from '../lib/auth.js';
 
+// Curated weekly case file IDs — must match src/constants/weeklyCaseFiles.ts
+const WEEKLY_CASE_FILE_IDS = [
+  'T1566', 'T1486', 'T1059', 'T1110', 'T1204', 'T1136',
+  'T1046', 'T1113', 'T1087', 'T1498', 'T1593', 'T1547',
+];
+
+function getISOWeekNumber(date: Date = new Date()): number {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+function getCurrentWeeklyTechniqueId(): string {
+  const week = getISOWeekNumber();
+  return WEEKLY_CASE_FILE_IDS[week % WEEKLY_CASE_FILE_IDS.length];
+}
+
 interface DebriefBody {
   scenario: {
     title: string;
@@ -50,10 +69,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const decoded = verifyAuth(req, res, { requiredTier: ['professional', 'team'] });
+    // Allow all authenticated users (free users get debrief for weekly case)
+    const decoded = verifyAuth(req, res);
     if (!decoded) return;
 
     const { scenario, submission, progress } = req.body as DebriefBody;
+
+    // For non-pro users, validate this is the current weekly case
+    const userTier = decoded.tier || 'free';
+    if (userTier !== 'professional' && userTier !== 'team') {
+      const weeklyTechniqueId = getCurrentWeeklyTechniqueId();
+      if (scenario?.title) {
+        // We check by scenario ID if available via the scenarioId field
+        const scenarioId = (req.body as any).scenarioId;
+        if (scenarioId && scenarioId !== `cf-${weeklyTechniqueId}`) {
+          return res.status(403).json({ error: 'Free users can only debrief the weekly case file' });
+        }
+      }
+    }
     if (!scenario || !submission) {
       return res.status(400).json({ error: 'scenario and submission are required' });
     }
