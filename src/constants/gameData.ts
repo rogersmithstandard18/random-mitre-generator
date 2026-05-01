@@ -7,7 +7,7 @@ import type { ToolId, ThreatType, ThreatDef, GameTool } from '@/types/GameState'
 import type { MitreTactic } from '@/types/TranslationCard';
 
 /* ── Balance constants (from constants.py) ── */
-export const SYSTEM_HP_MAX = 100;
+export const SYSTEM_HP_MAX = 60;
 export const SP_PER_TURN = 4;
 export const GUESS_DAMAGE = 15;
 export const TOOL_BASE_DAMAGE = 25;
@@ -207,9 +207,9 @@ export const THREAT_TYPES: Record<ThreatType, ThreatDef> = {
   phishing: {
     name: 'Phishing Campaign',
     tiers: {
-      1: { hp: 40,  attackDamage: 6,  label: 'Basic' },
-      2: { hp: 70,  attackDamage: 12, label: 'Targeted' },
-      3: { hp: 100, attackDamage: 20, label: 'Spear-Phishing' },
+      1: { hp: 25,  attackDamage: 6,  label: 'Basic' },
+      2: { hp: 45,  attackDamage: 12, label: 'Targeted' },
+      3: { hp: 65,  attackDamage: 20, label: 'Spear-Phishing' },
     },
     introByTier: {
       1: 'ALERT: Employees reporting suspicious emails. A basic phishing campaign is underway.',
@@ -225,9 +225,9 @@ export const THREAT_TYPES: Record<ThreatType, ThreatDef> = {
   ransomware: {
     name: 'Ransomware Outbreak',
     tiers: {
-      1: { hp: 50,  attackDamage: 10, label: 'Commodity' },
-      2: { hp: 80,  attackDamage: 18, label: 'RaaS' },
-      3: { hp: 120, attackDamage: 28, label: 'State-Sponsored' },
+      1: { hp: 30,  attackDamage: 10, label: 'Commodity' },
+      2: { hp: 50,  attackDamage: 18, label: 'RaaS' },
+      3: { hp: 75,  attackDamage: 28, label: 'State-Sponsored' },
     },
     introByTier: {
       1: 'ALERT: File encryption detected on several endpoints. A commodity ransomware strain is spreading.',
@@ -243,9 +243,9 @@ export const THREAT_TYPES: Record<ThreatType, ThreatDef> = {
   apt: {
     name: 'Advanced Persistent Threat',
     tiers: {
-      1: { hp: 60,  attackDamage: 12, label: 'Criminal Group' },
-      2: { hp: 90,  attackDamage: 20, label: 'Nation-State' },
-      3: { hp: 130, attackDamage: 30, label: 'Zero-Day APT' },
+      1: { hp: 35,  attackDamage: 12, label: 'Criminal Group' },
+      2: { hp: 55,  attackDamage: 20, label: 'Nation-State' },
+      3: { hp: 80,  attackDamage: 30, label: 'Zero-Day APT' },
     },
     introByTier: {
       1: 'WARNING: Unusual low-and-slow activity detected. A criminal group may have persistent access.',

@@ -44,6 +44,7 @@ export default function ToolGrid({ state, onDeploy }: Props) {
               key={id}
               onClick={() => canUse && onDeploy(id)}
               disabled={!canUse}
+              className={canUse ? 'btn-shimmer' : ''}
               style={{
                 padding: 10,
                 borderRadius: 10,

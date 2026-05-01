@@ -1576,6 +1576,19 @@ a {
   }
 }
 
+@keyframes shimmer-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0), 0 0 6px 1px rgba(20, 184, 166, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.25), 0 0 12px 3px rgba(20, 184, 166, 0.3);
+  }
+}
+
+.btn-shimmer {
+  animation: shimmer-pulse 1.6s ease-in-out infinite;
+}
+
 /* ==========================================
    END PAYMENT PAGES
    ========================================== */
