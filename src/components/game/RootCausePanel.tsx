@@ -40,6 +40,7 @@ export default function RootCausePanel({ options, onGuess, disabled }: Props) {
               key={i}
               onClick={() => !wasSelected && !disabled && onGuess(i)}
               disabled={wasSelected || disabled}
+              className={!wasSelected && !disabled ? 'btn-shimmer' : ''}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '12px 14px', borderRadius: 10, textAlign: 'left',
