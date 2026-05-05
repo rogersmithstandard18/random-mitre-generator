@@ -87,7 +87,8 @@ export function PricingCard({ tier }: PricingCardProps) {
         </div>
       ) : (
         <div className="sales-pricing-price">
-          <span className="sales-pricing-amount">Custom Pricing</span>
+          <span className="sales-pricing-amount sales-pricing-amount-custom">Let's Talk</span>
+          <p className="sales-pricing-custom-note">Pricing tailored to your team size</p>
         </div>
       )}
       <ul className="sales-pricing-features">

@@ -130,7 +130,7 @@ export const salesPageCopy = {
           "Detection hints & mitigations",
           "Interactive SOC scenarios",
         ],
-        cta: "Start Learning",
+        cta: "Start Learning Now",
         highlighted: false,
       },
       {
@@ -155,7 +155,7 @@ export const salesPageCopy = {
         name: "Team",
         price: null,
         period: "month" as const,
-        description: "For teams and organizations",
+        description: "For teams and organizations — let's find a plan that fits",
         features: [
           "Everything in Professional",
           "Team collaboration features",
@@ -213,7 +213,7 @@ export const salesPageCopy = {
     ctaHeadline: "Ready to Master Cybersecurity?",
     ctaSubheadline:
       "Join thousands of security professionals learning the smart way.",
-    ctaButton: "Get Started Free",
+    ctaButton: "Start Learning Now",
     links: {
       product: [
         { label: "Features", href: "#features" },
@@ -222,12 +222,12 @@ export const salesPageCopy = {
       ],
       resources: [
         { label: "MITRE ATT&CK", href: "https://attack.mitre.org/", external: true },
-        { label: "Blog", href: "#" },
-        { label: "Documentation", href: "#" },
+        { label: "Blog (Coming Soon)", href: "#" },
+        { label: "Documentation (Coming Soon)", href: "#" },
       ],
       company: [
         { label: "About", href: "/about" },
-        { label: "Contact", href: "#" },
+        { label: "Contact", href: "mailto:teacheme@zohomail.com" },
         { label: "Privacy Policy", href: "/privacy" },
         { label: "Terms of Service", href: "/terms" },
       ],

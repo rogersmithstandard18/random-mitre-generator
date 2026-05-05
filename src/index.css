@@ -832,9 +832,54 @@ a {
 
 .sales-hero-cta {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.sales-hero-cta-primary {
+  display: flex;
   justify-content: center;
-  flex-wrap: wrap;
+}
+
+.sales-hero-cta-secondary {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #888;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.sales-hero-cta-secondary:hover {
+  color: #FF5252;
+}
+
+.sales-hero-scroll-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #bbb;
+  margin: 32px auto 0;
+  padding: 8px;
+  border-radius: 50%;
+  transition: color 0.2s, transform 0.2s;
+  animation: bounce 2s infinite;
+}
+
+.sales-hero-scroll-indicator:hover {
+  color: #FF5252;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
 }
 
 /* Feature Card */
@@ -928,7 +973,7 @@ a {
 
 .sales-pricing-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -963,6 +1008,9 @@ a {
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
+  background: #F59E0B !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
 }
 
 .sales-pricing-name {
@@ -999,6 +1047,16 @@ a {
 .sales-pricing-period {
   font-size: 16px;
   color: #888;
+}
+
+.sales-pricing-amount-custom {
+  font-size: 36px !important;
+}
+
+.sales-pricing-custom-note {
+  font-size: 13px;
+  color: #888;
+  margin: 4px 0 0 0;
 }
 
 .sales-pricing-features {
@@ -1235,14 +1293,20 @@ a {
 }
 
 /* Responsive for Sales Components */
+@media (max-width: 1100px) {
+  .sales-pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .sales-grid-3 {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .sales-pricing-grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 700px;
     margin: 0 auto;
   }
 
@@ -1280,6 +1344,11 @@ a {
   .sales-grid-2,
   .sales-grid-3 {
     grid-template-columns: 1fr;
+  }
+
+  .sales-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
   }
 
   .sales-headline {

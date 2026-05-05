@@ -1,4 +1,4 @@
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ChevronDown } from 'lucide-react';
 import { salesPageCopy } from '../../constants/salesPageCopy';
 import { SalesButton, SalesSection } from './shared';
 import { GoogleLoginButton } from '../auth/GoogleLoginButton';
@@ -12,6 +12,13 @@ export function HeroSection() {
     const pricingSection = document.getElementById('pricing');
     if (pricingSection) {
       pricingSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const scrollToNext = () => {
+    const featuresSection = document.getElementById('features');
+    if (featuresSection) {
+      featuresSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -31,20 +38,26 @@ export function HeroSection() {
         </ul>
 
         <div className="sales-hero-cta">
-          {isAuthenticated ? (
-            <SalesButton variant="primary" size="lg" to="/learn">
-              {hero.primaryCTA}
-            </SalesButton>
-          ) : (
-            <div className="google-login-wrapper">
-              <GoogleLoginButton />
-            </div>
-          )}
-          <SalesButton variant="outline" size="lg" onClick={scrollToPricing}>
+          <div className="sales-hero-cta-primary">
+            {isAuthenticated ? (
+              <SalesButton variant="primary" size="lg" to="/learn">
+                {hero.primaryCTA}
+              </SalesButton>
+            ) : (
+              <div className="google-login-wrapper">
+                <GoogleLoginButton />
+              </div>
+            )}
+          </div>
+          <button className="sales-hero-cta-secondary" onClick={scrollToPricing}>
             {hero.secondaryCTA}
-          </SalesButton>
+          </button>
         </div>
       </div>
+
+      <button className="sales-hero-scroll-indicator" onClick={scrollToNext} aria-label="Scroll down">
+        <ChevronDown size={24} />
+      </button>
     </SalesSection>
   );
 }
