@@ -38,7 +38,6 @@ function AppContent() {
           {isAuthenticated ? (
             <>
               <div className="navbar-links">
-                <NavLink to="/" end>Home</NavLink>
                 <NavLink to="/learn">Learn</NavLink>
                 <NavLink to="/scenarios">Scenarios</NavLink>
                 <NavLink to="/case-files">Case Files</NavLink>
