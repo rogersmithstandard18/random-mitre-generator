@@ -26,9 +26,6 @@ CREATE TABLE IF NOT EXISTS techniques (
 );
 
 -- ── CVEs TABLE ──────────────────────────────────────────────
--- Note: mitre_technique_ids uses a TEXT[] array for simplicity.
--- For full referential integrity, promote this to a junction table
--- (cve_techniques) once the schema stabilises.
 CREATE TABLE IF NOT EXISTS cves (
   id                   UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   cve_id               TEXT UNIQUE NOT NULL
@@ -39,8 +36,14 @@ CREATE TABLE IF NOT EXISTS cves (
   cvss_score           DECIMAL(3,1) CHECK (cvss_score >= 0 AND cvss_score <= 10),
   published_date       DATE,
   affected_products    JSONB NOT NULL DEFAULT '[]',
-  mitre_technique_ids  TEXT[] NOT NULL DEFAULT '{}',
   created_at           TIMESTAMPTZ DEFAULT now()
+);
+
+-- ── JUNCTION TABLE: CVE ↔ MITRE Technique (many-to-many) ───
+CREATE TABLE IF NOT EXISTS cve_techniques (
+  cve_id               TEXT NOT NULL REFERENCES cves(cve_id) ON DELETE CASCADE,
+  technique_id         TEXT NOT NULL REFERENCES techniques(technique_id) ON DELETE CASCADE,
+  PRIMARY KEY (cve_id, technique_id)
 );
 
 -- ── INDEXES ─────────────────────────────────────────────────
@@ -48,14 +51,18 @@ CREATE INDEX IF NOT EXISTS idx_techniques_tactic        ON techniques (tactic);
 CREATE INDEX IF NOT EXISTS idx_techniques_difficulty     ON techniques (difficulty);
 CREATE INDEX IF NOT EXISTS idx_cves_severity             ON cves (severity);
 CREATE INDEX IF NOT EXISTS idx_cves_cvss                 ON cves (cvss_score DESC);
-CREATE INDEX IF NOT EXISTS idx_cves_mitre_techniques     ON cves USING GIN (mitre_technique_ids);
+CREATE INDEX IF NOT EXISTS idx_cve_techniques_technique  ON cve_techniques (technique_id);
 
 -- ── ROW LEVEL SECURITY (public read, no public write) ───────
-ALTER TABLE techniques ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cves       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE techniques   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cves         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cve_techniques ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Public read techniques"
   ON techniques FOR SELECT USING (true);
 
 CREATE POLICY "Public read cves"
   ON cves FOR SELECT USING (true);
+
+CREATE POLICY "Public read cve_techniques"
+  ON cve_techniques FOR SELECT USING (true);
