@@ -69,7 +69,5 @@ INSERT INTO techniques (
  ARRAY['Kernel-level EDR with syscall monitoring','Memory integrity scanning','Behavioral detection for unusual API call patterns'],
  ARRAY['Endpoint detection with kernel-level visibility','Application allowlisting','Memory protection features (e.g., Windows Defender Credential Guard)'],
  'Why do sophisticated attackers prefer direct syscalls over higher-level Windows API calls?',
- 'An EDR alert flags a process making direct NTDLL syscalls to allocate memory and inject code — bypassing the API hooks the security tool relies on.'),
-
--- ── PERSISTENCE ─────────────────────────────────────────────
+ 'An EDR alert flags a process making direct NTDLL syscalls to allocate memory and inject code — bypassing the API hooks the security tool relies on.')
 ON CONFLICT (technique_id) DO NOTHING;

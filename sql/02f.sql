@@ -69,7 +69,5 @@ INSERT INTO techniques (
  ARRAY['Process access monitoring for browser credential stores','Endpoint detection for credential extraction tools','Browser extension auditing'],
  ARRAY['Enterprise password manager with no browser save','Endpoint protection with credential theft detection','Privileged workstation policies prohibiting general browsing'],
  'Why are browser-saved passwords a higher risk than people generally assume?',
- 'An attacker runs a tool that extracts all Chrome saved passwords in under 30 seconds from an unlocked workstation — no administrative privileges required.'),
-
--- ── DISCOVERY ───────────────────────────────────────────────
+ 'An attacker runs a tool that extracts all Chrome saved passwords in under 30 seconds from an unlocked workstation — no administrative privileges required.')
 ON CONFLICT (technique_id) DO NOTHING;
