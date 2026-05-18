@@ -77,7 +77,5 @@ INSERT INTO cves (
 ('CVE-2024-6387', 'Race condition in OpenSSH sshd leading to unauthenticated remote code execution. Known as regreSSHion.',
  'regreSSHion — a regression that brought back a 2006 OpenSSH bug. The race condition was hard to exploit but theoretically allowed unauthenticated RCE on millions of Linux servers running SSH.',
  'HIGH', 8.1, '2024-07-01',
- '[{"vendor":"OpenSSH","product":"sshd","versions":"8.5p1 through 9.7p1"}]'),
-
--- ── CVSS 7.8 ────────────────────────────────────────────────
+ '[{"vendor":"OpenSSH","product":"sshd","versions":"8.5p1 through 9.7p1"}]')
 ON CONFLICT (cve_id) DO NOTHING;

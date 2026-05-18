@@ -71,7 +71,5 @@ INSERT INTO cves (
 ('CVE-2022-22965', 'Remote code execution in Spring Framework via data binding on JDK 9+. Known as Spring4Shell.',
  'Spring4Shell — a critical bug in the Spring Java framework affecting applications running on newer Java versions. Could allow full server takeover via crafted HTTP parameters.',
  'CRITICAL', 9.8, '2022-04-01',
- '[{"vendor":"Spring","product":"Spring Framework","versions":"5.3.0-5.3.17, 5.2.0-5.2.19"}]'),
-
--- ── CVSS 9.4-9.6 ────────────────────────────────────────────
+ '[{"vendor":"Spring","product":"Spring Framework","versions":"5.3.0-5.3.17, 5.2.0-5.2.19"}]')
 ON CONFLICT (cve_id) DO NOTHING;
