@@ -16,7 +16,7 @@ INSERT INTO techniques (
  'Business Interruption',
  'A process named "svchost32.exe" looks legitimate to a casual observer but is not a real Windows process. Detection requires knowing what legitimate looks like.',
  'Attackers rename their tools to look like normal Windows processes or user applications. Without verified process integrity, it is nearly impossible to separate attacker activity from legitimate operations.',
- '[{"industry":"Technology","description":"Malware renamed to "chrome_update.exe" placed in a temp folder and added to startup."},{"industry":"Financial Services","description":"Attacker''s C2 binary named "svchost.exe" running from a user''s AppData folder instead of System32."}]',
+ '[{"industry":"Technology","description":"Malware renamed to \"chrome_update.exe\" placed in a temp folder and added to startup."},{"industry":"Financial Services","description":"Attacker''s C2 binary named \"svchost.exe\" running from a user''s AppData folder instead of System32."}]',
  ARRAY['Process path verification (svchost.exe should only run from System32)','File hash comparison against known-good baselines','Parent process anomaly detection'],
  ARRAY['Endpoint detection with process integrity verification','Application allowlisting based on path and hash','Alert on known-good process names running from unexpected paths'],
  'How can security teams efficiently distinguish legitimate system processes from masquerading malware?',
