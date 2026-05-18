@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTopicStore } from '@/store/topicStore';
 import { difficultyConfigs } from '@/constants/learningPaths';
-import techniques from '@/constants/techniques';
 
 export default function HistoryPage() {
   const [tab, setTab] = useState<'history' | 'favorites'>('history');
   const navigate = useNavigate();
   const cardHistory = useTopicStore(s => s.cardHistory);
   const favorites = useTopicStore(s => s.favorites);
-  const store = useTopicStore();
+  const techniques = useTopicStore(s => s.techniques);
 
   const favoriteCards = techniques.filter(t => favorites.includes(t.techniqueId));
   const items = tab === 'history' ? cardHistory : favoriteCards;

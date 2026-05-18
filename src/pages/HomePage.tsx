@@ -4,16 +4,18 @@ import { Shuffle, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useTopicStore } from '@/store/topicStore';
 import { useAuthStore } from '@/store/authStore';
 import FilterBar from '@/components/FilterBar';
-import localCaseFileScenarios from '@/constants/caseFileScenarios';
+import { buildCaseFiles } from '@/constants/caseFileScenarios';
 import { getWeeklyCaseFileId, getNextWeekReset } from '@/constants/weeklyCaseFiles';
 
 function WeeklyCaseBanner() {
   const token = useAuthStore(s => s.token);
+  const storeTechniques = useTopicStore(s => s.techniques);
   const [alreadyUsed, setAlreadyUsed] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
+  const allScenarios = useMemo(() => buildCaseFiles(storeTechniques).scenarios, [storeTechniques]);
   const weeklyCaseFileId = getWeeklyCaseFileId();
-  const weeklyScenario = localCaseFileScenarios.find(s => s.id === weeklyCaseFileId);
+  const weeklyScenario = allScenarios.find(s => s.id === weeklyCaseFileId);
   const nextReset = useMemo(() => getNextWeekReset(), []);
 
   // Check weekly status
