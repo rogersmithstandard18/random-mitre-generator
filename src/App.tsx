@@ -6,6 +6,7 @@ import DemoPage from './pages/DemoPage';
 import HistoryPage from './pages/HistoryPage';
 import ScenariosPage from './pages/ScenariosPage';
 import CaseFilesPage from './pages/CaseFilesPage';
+import SecOpsSimPage from './pages/SecOpsSimPage';
 import { SalesPage } from './pages/SalesPage';
 import { PaymentSuccessPage } from './pages/PaymentSuccessPage';
 import { PaymentCancelPage } from './pages/PaymentCancelPage';
@@ -21,6 +22,7 @@ function AppContent() {
   const isSalesPage = location.pathname === '/';
   const isDemoPage = location.pathname === '/demo';
   const isCaseFilesPage = location.pathname === '/case-files';
+  const isSecOpsSimPage = location.pathname === '/secops-sim';
   const isTermsPage = location.pathname === '/terms';
   const isPrivacyPage = location.pathname === '/privacy';
   const isAboutPage = location.pathname === '/about';
@@ -41,6 +43,7 @@ function AppContent() {
                 <NavLink to="/learn">Learn</NavLink>
                 <NavLink to="/scenarios">Scenarios</NavLink>
                 <NavLink to="/case-files">Case Files</NavLink>
+                <NavLink to="/secops-sim">SecOps Sim</NavLink>
                 <NavLink to="/history">History</NavLink>
               </div>
               <UserMenu />
@@ -65,6 +68,10 @@ function AppContent() {
       ) : isCaseFilesPage ? (
         <Routes>
           <Route path="/case-files" element={<CaseFilesPage />} />
+        </Routes>
+      ) : isSecOpsSimPage ? (
+        <Routes>
+          <Route path="/secops-sim" element={<SecOpsSimPage />} />
         </Routes>
       ) : isTermsPage ? (
         <Routes>
