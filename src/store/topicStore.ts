@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import techniques from '@/constants/techniques';
-import { TranslationCard, Difficulty, LearningPath, MitreTactic } from '@/types/TranslationCard';
+import inlineTechniques from '@/constants/techniques';
+import { TranslationCard, Difficulty, LearningPath, MitreTactic, RiskCategory, IndustryImpact } from '@/types/TranslationCard';
 import { useAuthStore } from './authStore';
+import { supabase } from '@/lib/supabase';
 
 interface Filters {
   difficulty: Difficulty | null;
@@ -16,6 +17,8 @@ interface TopicState {
   favorites: string[];
   filters: Filters;
   showAdvanced: boolean;
+  techniques: TranslationCard[];
+  techniquesLoaded: boolean;
 
   generateRandomCard: () => void;
   setFilter: (key: keyof Filters, value: string | null) => void;
@@ -23,9 +26,31 @@ interface TopicState {
   toggleFavorite: (techniqueId: string) => void;
   toggleAdvanced: () => void;
   restoreFromServer: (data: { cardHistory?: unknown[]; favorites?: string[]; showAdvanced?: boolean }) => void;
+  loadTechniques: () => Promise<void>;
 }
 
-function getFilteredTechniques(filters: Filters): TranslationCard[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapRow(row: Record<string, any>): TranslationCard {
+  return {
+    techniqueId: row.technique_id,
+    techniqueName: row.technique_name,
+    tactic: row.tactic as MitreTactic,
+    tacticId: row.tactic_id,
+    difficulty: row.difficulty as Difficulty,
+    learningPaths: row.learning_paths as LearningPath[],
+    plainExplanation: row.plain_explanation,
+    riskCategory: row.risk_category as RiskCategory,
+    riskDescription: row.risk_description,
+    boardroomPitch: row.boardroom_pitch,
+    industryImpacts: row.industry_impacts as IndustryImpact[],
+    detectionHints: row.detection_hints as string[],
+    mitigations: row.mitigations as string[],
+    reflectionQuestion: row.reflection_question,
+    spotTheRisk: row.spot_the_risk,
+  };
+}
+
+function getFilteredTechniques(techniques: TranslationCard[], filters: Filters): TranslationCard[] {
   let pool = techniques;
   if (filters.difficulty) {
     pool = pool.filter(t => t.difficulty === filters.difficulty);
@@ -69,10 +94,24 @@ export const useTopicStore = create<TopicState>()(
       favorites: [],
       filters: { difficulty: null, learningPath: null, tactic: null },
       showAdvanced: false,
+      techniques: inlineTechniques,
+      techniquesLoaded: false,
+
+      loadTechniques: async () => {
+        const { data, error } = await supabase
+          .from('techniques')
+          .select('*')
+          .order('technique_id');
+        if (!error && data && data.length > 0) {
+          set({ techniques: data.map(mapRow), techniquesLoaded: true });
+        } else {
+          set({ techniquesLoaded: true });
+        }
+      },
 
       generateRandomCard: () => {
-        const { cardHistory, filters } = get();
-        const pool = getFilteredTechniques(filters);
+        const { cardHistory, filters, techniques } = get();
+        const pool = getFilteredTechniques(techniques, filters);
         if (pool.length === 0) return;
 
         const recentIds = cardHistory.slice(0, Math.min(cardHistory.length, 3)).map(c => c.techniqueId);

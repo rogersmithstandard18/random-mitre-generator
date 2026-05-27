@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Shield, Lock, Info, Clock, ArrowRight, Zap } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import type { CaseFileScenario } from '@/types/CaseFile';
-import localCaseFileScenarios, { caseFileFilterMeta } from '@/constants/caseFileScenarios';
+import { buildCaseFiles } from '@/constants/caseFileScenarios';
+import { useTopicStore } from '@/store/topicStore';
 import { useGameEngine } from '@/hooks/useGameEngine';
 import { getWeeklyCaseFileId, getNextWeekReset, WEEKLY_CASE_FILE_IDS } from '@/constants/weeklyCaseFiles';
 
@@ -125,13 +126,13 @@ function useCountdown(targetDate: Date) {
 /* ═══════════════════════════════════════════════════════════
    WEEKLY CASE FILE SCREEN (FREE TIER)
 ═══════════════════════════════════════════════════════════ */
-function WeeklyCaseFileScreen({ onStartGame }: { onStartGame: () => void }) {
+function WeeklyCaseFileScreen({ onStartGame, allScenarios }: { onStartGame: () => void; allScenarios: CaseFileScenario[] }) {
   const token = useAuthStore(s => s.token);
   const [weeklyData, setWeeklyData] = useState<{ alreadyUsed: boolean; nextResetAt: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const weeklyCaseFileId = getWeeklyCaseFileId();
-  const weeklyScenario = localCaseFileScenarios.find(s => s.id === weeklyCaseFileId);
+  const weeklyScenario = allScenarios.find(s => s.id === weeklyCaseFileId);
   const nextReset = useMemo(() => getNextWeekReset(), []);
   const countdown = useCountdown(nextReset);
 
@@ -142,11 +143,11 @@ function WeeklyCaseFileScreen({ onStartGame }: { onStartGame: () => void }) {
     for (let i = 1; i <= 3; i++) {
       const futureDate = new Date(now.getTime() + i * 7 * 86400000);
       const futureId = getWeeklyCaseFileId(futureDate);
-      const scenario = localCaseFileScenarios.find(s => s.id === futureId);
+      const scenario = allScenarios.find(s => s.id === futureId);
       if (scenario) upcoming.push(scenario);
     }
     return upcoming;
-  }, []);
+  }, [allScenarios]);
 
   useEffect(() => {
     if (!token) { setLoading(false); return; }
@@ -275,6 +276,12 @@ export default function CaseFilesPage() {
   const token = useAuthStore(s => s.token);
   const features = useAuthStore(s => s.getTierFeatures());
   const userTier = useAuthStore(s => s.getUserTier());
+  const storeTechniques = useTopicStore(s => s.techniques);
+
+  const allLocalScenarios = useMemo(
+    () => buildCaseFiles(storeTechniques).scenarios,
+    [storeTechniques]
+  );
 
   const [scenarios, setScenarios] = useState<CaseFileScenario[]>([]);
   const [loading, setLoading] = useState(true);
@@ -288,14 +295,14 @@ export default function CaseFilesPage() {
     // For free-tier weekly case: use the single weekly scenario from local data
     if (isFreeTier) {
       const weeklyCaseFileId = getWeeklyCaseFileId();
-      const weeklyScenario = localCaseFileScenarios.find(s => s.id === weeklyCaseFileId);
+      const weeklyScenario = allLocalScenarios.find(s => s.id === weeklyCaseFileId);
       if (weeklyScenario) setScenarios([weeklyScenario]);
       setLoading(false);
       return;
     }
     if (!features.canAccessCaseFiles) { setLoading(false); return; }
     if (!token) {
-      setScenarios(localCaseFileScenarios);
+      setScenarios(allLocalScenarios);
       setLoading(false);
       return;
     }
@@ -307,13 +314,13 @@ export default function CaseFilesPage() {
       })
       .then(data => {
         const remote = data.scenarios || [];
-        setScenarios([...localCaseFileScenarios, ...remote]);
+        setScenarios([...allLocalScenarios, ...remote]);
       })
       .catch(() => {
-        setScenarios(localCaseFileScenarios);
+        setScenarios(allLocalScenarios);
       })
       .finally(() => setLoading(false));
-  }, [features.canAccessCaseFiles, isFreeTier, token]);
+  }, [features.canAccessCaseFiles, isFreeTier, token, allLocalScenarios]);
 
   // Not authenticated and no weekly access — full lock
   if (!features.canAccessCaseFiles && !features.canAccessWeeklyCaseFile) {
@@ -339,7 +346,7 @@ export default function CaseFilesPage() {
   if (isFreeTier && !weeklyGameStarted) {
     return (
       <>
-        <WeeklyCaseFileScreen onStartGame={() => setWeeklyGameStarted(true)} />
+        <WeeklyCaseFileScreen onStartGame={() => setWeeklyGameStarted(true)} allScenarios={allLocalScenarios} />
         <style>{`
           @keyframes cf-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         `}</style>

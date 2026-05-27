@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { Shield } from 'lucide-react';
@@ -16,9 +17,16 @@ import { AboutPage } from './pages/AboutPage';
 import { UserMenu } from './components/auth/UserMenu';
 import { GoogleLoginButton } from './components/auth/GoogleLoginButton';
 import { useAuthStore } from './store/authStore';
+import { useTopicStore } from './store/topicStore';
 
 function AppContent() {
   const location = useLocation();
+  const loadTechniques = useTopicStore(s => s.loadTechniques);
+
+  useEffect(() => {
+    loadTechniques();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const isSalesPage = location.pathname === '/';
   const isDemoPage = location.pathname === '/demo';
   const isCaseFilesPage = location.pathname === '/case-files';

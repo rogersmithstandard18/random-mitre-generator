@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import techniques from '@/constants/techniques';
+import { useTopicStore } from '@/store/topicStore';
 import { TranslationCard } from '@/types/TranslationCard';
 import TranslationCardView from '@/components/TranslationCardView';
 import DemoLimitReached from '@/components/DemoLimitReached';
@@ -29,7 +29,8 @@ export default function DemoPage() {
       return;
     }
     const newCount = count + 1;
-    const card = techniques[Math.floor(Math.random() * techniques.length)];
+    const pool = useTopicStore.getState().techniques;
+    const card = pool[Math.floor(Math.random() * pool.length)];
     setCurrentCard(card);
     setStoredCount(newCount);
     setGenCount(newCount);
